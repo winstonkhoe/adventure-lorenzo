@@ -9,16 +9,6 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: IceMist
   m_Shader: {fileID: 4800000, guid: 0406db5a14f94604a8c57ccfbc9f3b46, type: 3}
-<<<<<<< HEAD
-  m_ShaderKeywords: _ALPHABLEND_ON _FADING_ON _FLIPBOOKBLENDING_OFF
-  m_LightmapFlags: 0
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses:
-  - ALWAYS
-=======
   m_ShaderKeywords: _COLORADDSUBDIFF_ON _EMISSION _FADING_ON _SOFTPARTICLES_ON
   m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
@@ -29,7 +19,6 @@ Material:
   disabledShaderPasses:
   - ALWAYS
   - SHADOWCASTER
->>>>>>> f6d28fc (Upload SLN(2))
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -76,34 +65,21 @@ Material:
     m_Floats:
     - _AlphaClip: 0
     - _AlphaThreshold: 1
-<<<<<<< HEAD
-    - _Blend: 0
-=======
     - _Blend: 2
->>>>>>> f6d28fc (Upload SLN(2))
     - _BlendOp: 0
     - _BumpScale: 1
     - _CameraFadingEnabled: 0
     - _CameraFarFadeDistance: 2
     - _CameraNearFadeDistance: 1
-<<<<<<< HEAD
-    - _ColorMode: 0
-    - _Cull: 2
-=======
     - _ColorMode: 1
     - _Cull: 0
->>>>>>> f6d28fc (Upload SLN(2))
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DistortionBlend: 0.5
     - _DistortionEnabled: 0
     - _DistortionStrength: 1
     - _DistortionStrengthScaled: 0.1
-<<<<<<< HEAD
-    - _DstBlend: 10
-=======
     - _DstBlend: 1
->>>>>>> f6d28fc (Upload SLN(2))
     - _EmissionEnabled: 0
     - _FlipbookBlending: 0
     - _FlipbookMode: 0
@@ -128,20 +104,12 @@ Material:
     - _ZWrite: 0
     m_Colors:
     - _BaseColor: {r: 0.7662869, g: 0.78055924, b: 0.7924528, a: 1}
-<<<<<<< HEAD
-    - _BaseColorAddSubDiff: {r: 0, g: 0, b: 0, a: 0}
-=======
     - _BaseColorAddSubDiff: {r: 1, g: 0, b: 0, a: 0}
->>>>>>> f6d28fc (Upload SLN(2))
     - _CameraFadeParams: {r: 0, g: Infinity, b: 0, a: 0}
     - _Color: {r: 0.7662869, g: 0.78055924, b: 0.7924528, a: 1}
     - _ColorAddSubDiff: {r: 0, g: 0, b: 0, a: 0}
     - _EmisColor: {r: 0.60294116, g: 0.60294116, b: 0.60294116, a: 0}
-<<<<<<< HEAD
-    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-=======
     - _EmissionColor: {r: 0, g: 1.8626572, b: 3.962264, a: 1}
->>>>>>> f6d28fc (Upload SLN(2))
     - _SoftParticleFadeParams: {r: 0, g: 1, b: 0, a: 0}
     - _TintColor: {r: 0.63235295, g: 0.63235295, b: 0.63235295, a: 0.5}
   m_BuildTextureStacks: []

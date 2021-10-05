@@ -6,10 +6,7 @@ TagManager:
   tags:
   - Shootable
   - Enemy
-<<<<<<< HEAD
-=======
   - Item
->>>>>>> f6d28fc (Upload SLN(2))
   layers:
   - Default
   - TransparentFX
