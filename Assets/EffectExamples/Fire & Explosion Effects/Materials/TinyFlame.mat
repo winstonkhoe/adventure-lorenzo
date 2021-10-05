@@ -22,6 +22,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: TinyFlame
   m_Shader: {fileID: 4800000, guid: 0406db5a14f94604a8c57ccfbc9f3b46, type: 3}
+<<<<<<< HEAD
   m_ShaderKeywords: _ALPHABLEND_ON _EMISSION _FADING_ON _FLIPBOOKBLENDING_OFF _REQUIRE_UV2
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
@@ -30,11 +31,27 @@ Material:
   stringTagMap: {}
   disabledShaderPasses:
   - ALWAYS
+=======
+  m_ShaderKeywords: _EMISSION _FADING_ON _FLIPBOOKBLENDING_ON _SOFTPARTICLES_ON
+  m_LightmapFlags: 2
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 1
+  m_CustomRenderQueue: 3000
+  stringTagMap:
+    RenderType: Transparent
+  disabledShaderPasses:
+  - ALWAYS
+  - SHADOWCASTER
+>>>>>>> f6d28fc (Upload SLN(2))
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseMap:
+<<<<<<< HEAD
         m_Texture: {fileID: 2800000, guid: 4aa9e9c9f98c7a449ac023f74184d0b0, type: 3}
+=======
+        m_Texture: {fileID: 2800000, guid: 06e4a78c75e10c145a9156e32089ec9c, type: 3}
+>>>>>>> f6d28fc (Upload SLN(2))
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -54,7 +71,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
+<<<<<<< HEAD
         m_Texture: {fileID: 2800000, guid: 4aa9e9c9f98c7a449ac023f74184d0b0, type: 3}
+=======
+        m_Texture: {fileID: 2800000, guid: 06e4a78c75e10c145a9156e32089ec9c, type: 3}
+>>>>>>> f6d28fc (Upload SLN(2))
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
@@ -75,7 +96,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _AlphaClip: 0
+<<<<<<< HEAD
     - _Blend: 0
+=======
+    - _Blend: 2
+>>>>>>> f6d28fc (Upload SLN(2))
     - _BlendOp: 0
     - _BumpScale: 1
     - _CameraFadingEnabled: 0
@@ -89,7 +114,11 @@ Material:
     - _DistortionEnabled: 0
     - _DistortionStrength: 1
     - _DistortionStrengthScaled: 0
+<<<<<<< HEAD
     - _DstBlend: 10
+=======
+    - _DstBlend: 1
+>>>>>>> f6d28fc (Upload SLN(2))
     - _EmissionEnabled: 1
     - _FlipbookBlending: 1
     - _FlipbookMode: 1
@@ -102,6 +131,10 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _QueueOffset: 0
+<<<<<<< HEAD
+=======
+    - _SampleGI: 0
+>>>>>>> f6d28fc (Upload SLN(2))
     - _SmoothnessTextureChannel: 0
     - _SoftParticlesEnabled: 1
     - _SoftParticlesFarFadeDistance: 0.1
@@ -112,11 +145,20 @@ Material:
     - _UVSec: 0
     - _ZWrite: 0
     m_Colors:
+<<<<<<< HEAD
     - _BaseColor: {r: 0.7490196, g: 0.7490196, b: 0.7490196, a: 1}
     - _BaseColorAddSubDiff: {r: 0, g: 0, b: 0, a: 0}
     - _CameraFadeParams: {r: 0, g: Infinity, b: 0, a: 0}
     - _Color: {r: 0.7490196, g: 0.7490196, b: 0.7490196, a: 1}
     - _ColorAddSubDiff: {r: 1, g: 0, b: 0, a: 0}
     - _EmissionColor: {r: 2.9960785, g: 2.9960785, b: 2.9960785, a: 1}
+=======
+    - _BaseColor: {r: 0, g: 1, b: 0.9906862, a: 1}
+    - _BaseColorAddSubDiff: {r: 1, g: 0, b: 0, a: 0}
+    - _CameraFadeParams: {r: 0, g: Infinity, b: 0, a: 0}
+    - _Color: {r: 0.8584906, g: 0.83630306, b: 0.61957103, a: 0.45490196}
+    - _ColorAddSubDiff: {r: 1, g: 0, b: 0, a: 0}
+    - _EmissionColor: {r: 4.485582, g: 15.094339, b: 14.247678, a: 1}
+>>>>>>> f6d28fc (Upload SLN(2))
     - _SoftParticleFadeParams: {r: 0, g: 10, b: 0, a: 0}
   m_BuildTextureStacks: []

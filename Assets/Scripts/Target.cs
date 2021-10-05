@@ -11,6 +11,10 @@ public class Target : MonoBehaviour
 
     private bool droppedCoreItem = false;
     public float health = 50f;
+<<<<<<< HEAD
+=======
+    private bool inRange = false;
+>>>>>>> f6d28fc (Upload SLN(2))
     public void TakeDamage(float amount)
     {
         health -= amount;
@@ -32,8 +36,23 @@ public class Target : MonoBehaviour
             //Instantiate(coreItem, controller.transform, true);
         }
         Destroy(gameObject, 4f);
+<<<<<<< HEAD
 
     }
+=======
+    }
+
+    public void setInRange(bool value)
+    {
+        inRange = value;
+    }
+
+    public bool getInRange()
+    {
+        return inRange;
+    }
+
+>>>>>>> f6d28fc (Upload SLN(2))
     void Start()
     {
         animator = GetComponent<Animator>();

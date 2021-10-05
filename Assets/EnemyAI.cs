@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+<<<<<<< HEAD
+=======
+using UnityEngine.UI;
+>>>>>>> f6d28fc (Upload SLN(2))
 
 public class EnemyAI : MonoBehaviour
 {
@@ -30,16 +34,33 @@ public class EnemyAI : MonoBehaviour
     public float attackRange;
     public bool playerInAttackRange;
 
+<<<<<<< HEAD
+=======
+    public Slider healthBar;
+    public Image Bomb;
+
+    private Target target;
+
+>>>>>>> f6d28fc (Upload SLN(2))
     private void Awake()
     {
         player = GameObject.Find("Ken").transform;
         agent = GetComponent<NavMeshAgent>();
+<<<<<<< HEAD
+=======
+        Bomb.gameObject.SetActive(false);
+>>>>>>> f6d28fc (Upload SLN(2))
     }
 
 
     // Start is called before the first frame update
     void Start()
     {
+<<<<<<< HEAD
+=======
+        target = GetComponent<Target>();
+        healthBar.maxValue = target.health;
+>>>>>>> f6d28fc (Upload SLN(2))
         enemyGun = GetComponent<EnemyGun>();
         animator = GetComponent<Animator>();
     }
@@ -47,6 +68,18 @@ public class EnemyAI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+<<<<<<< HEAD
+=======
+        if(target.getInRange() == true)
+        {
+            Bomb.gameObject.SetActive(true);
+        }
+        else
+        {
+            Bomb.gameObject.SetActive(false);
+        }
+        healthBar.value = target.health;
+>>>>>>> f6d28fc (Upload SLN(2))
         playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
         if (!playerInAttackRange) Patroling();
         if (playerInAttackRange) AttackPlayer();
