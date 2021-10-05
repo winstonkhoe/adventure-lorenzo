@@ -22,19 +22,23 @@ public class Player : MonoBehaviour
     //Attack  
     Collider[] hitColliders;
     Collider[] prevHitColliders;
+    public Image attackedEffect;
     public float electricDamage = 125f;
 
     //Bar Values
     public int healthPoint = 1000;
+    private int extraHealth = 0;
     public int skillPoint = 200;
     public Slider healthBar;
+    public Slider skillBar;
 
-    public Gun playerGun;
+    Gun playerGun;
     public LineRenderer radiusLine;
 
     public LayerMask whatIsEnemy;
 
     //Ammo
+
     public TMPro.TextMeshProUGUI ammoText;
 
     //CoreItem
@@ -43,15 +47,20 @@ public class Player : MonoBehaviour
 
     //Inventory
     Inventory inventory;
+    public GameObject shield;
 
     private static int V = 5;
     static int[] parent;
+
 
     
     void Start()
     {
         inventory = GetComponent<Inventory>();
         playerGun = GetComponent<Gun>();
+        shield.SetActive(false);
+        healthBar.maxValue = healthPoint;
+        skillBar.maxValue = skillPoint;
         initRadius();
     }
 
@@ -61,6 +70,7 @@ public class Player : MonoBehaviour
         ammoText.text = playerGun.AmmoText();
         coreItemText.text = "CORE ITEM: 0" + coreItemOwned + "/09";
         healthBar.value = healthPoint;
+        skillBar.value = skillPoint;
         playerPosition = transform.position;
 
         radiusLine.transform.position = transform.position;
@@ -80,7 +90,33 @@ public class Player : MonoBehaviour
             StartCoroutine(turnOnRadiusLine());
             StartCoroutine(ThunderEffectCheckEnemy(transform.position, 10f));
         }
+        if (Input.GetKeyDown(KeyCode.Keypad1) || Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            inventory.UseItem(1);
+        }
+        if (Input.GetKeyDown(KeyCode.Keypad2) || Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            inventory.UseItem(2);
+        }
+        if (Input.GetKeyDown(KeyCode.Keypad3) || Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            inventory.UseItem(3);
+        }
+        if (Input.GetKeyDown(KeyCode.Keypad4) || Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            inventory.UseItem(4);
+        }
+        if (Input.GetKeyDown(KeyCode.Keypad5) || Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            inventory.UseItem(5);
+        }
+        if (Input.GetKeyDown(KeyCode.Keypad6) || Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            inventory.UseItem(6);
+        }
     }
+
+
 
     static int minKey(float[] key, bool[] mstSet)
     {
@@ -98,13 +134,6 @@ public class Player : MonoBehaviour
 
         return min_index;
     }
-
-    //static void printMST(int[] parent, List<List<float>> graph)
-    //{
-    //    Debug.Log("Edge \tWeight");
-    //    for (int i = 1; i < V; i++)
-    //        Debug.Log(parent[i] + " - " + i + "\t" + graph[i][parent[i]]);
-    //}
 
     static void primMST(List<List<float>> graph)
     {
@@ -177,14 +206,86 @@ public class Player : MonoBehaviour
         }
     }
 
-    void useHealthPotion()
+    public void useAmmo()
+    {
+        playerGun.IncreaseAmmo(30);
+    }
+
+    public void useHealthPotion()
     {
         healthPoint += 200;
+    }
+
+    public void useSkillPotion()
+    {
+        skillPoint += 75;
+    }
+
+    public void useShield()
+    {
+        StartCoroutine(applyShield());
+    }
+
+    public void usePainKiller()
+    {
+        StartCoroutine(applyPainKiller());
+    }
+
+    public void useDamageMultiplier()
+    {
+        StartCoroutine(applyDamageMultiplier());
+    }
+
+    IEnumerator applyPainKiller()
+    {
+        int prevHealth = healthPoint;
+        healthPoint += 450;
+        
+        yield return new WaitForSeconds(1);
+        healthPoint -= 90;
+
+        yield return new WaitForSeconds(1);
+        healthPoint -= 90;
+
+        yield return new WaitForSeconds(1);
+        healthPoint -= 90;
+
+        yield return new WaitForSeconds(1);
+        healthPoint -= 90;
+        
+        yield return new WaitForSeconds(1);
+        healthPoint -= 90;
+        
+        if(healthPoint >= prevHealth)
+        {
+            healthPoint = prevHealth;
+        }
+    }
+
+    IEnumerator applyShield()
+    {
+        shield.SetActive(true);
+
+        yield return new WaitForSeconds(5);
+
+        shield.SetActive(false);
+    }
+
+    IEnumerator applyDamageMultiplier()
+    {
+        playerGun.damageMultiplier *= 2;
+
+        yield return new WaitForSeconds(5);
+
+        playerGun.damageMultiplier /= 2;
     }
 
     public void gotHit(int damage)
     {
         healthPoint -= damage;
+        Color spriteColor = attackedEffect.color;
+        attackedEffect.color = new Color(spriteColor.r, spriteColor.g, spriteColor.b, 100);
+        StartCoroutine(fadeOut(attackedEffect, 5f));
     }
 
     void OnControllerColliderHit(ControllerColliderHit hit)
@@ -233,19 +334,7 @@ public class Player : MonoBehaviour
             V = hitColliders.Length;
             if (prevHitColliders != null)
             {
-                //Debug.Log("Start Loop and Check for InRange");
-                //Debug.Log("PrevHitCollider");
-                //
-                /*
-                 * PrevHitColliders
-                 * Robot Kyle (1)
-                 * Robot Kyle (2)
-                 * Robot Kyle (3)
-                 * 
-                 * hitColliders
-                 * Robot Kyle (1)
-                 * Robot Kyle (2)
-                 */
+               
                 foreach (var phc in prevHitColliders)
                 {
                     //Debug.Log(phc.name);
@@ -272,10 +361,6 @@ public class Player : MonoBehaviour
                 h.GetComponent<Target>().setInRange(true);
             }
 
-
-            //Debug.Log(adjacentList[0][0]+","+ adjacentList[0][1]+","+ adjacentList[0][2]);
-            //Debug.Log(adjacentList[1][0]+","+ adjacentList[1][1]+","+ adjacentList[1][2]);
-            //Debug.Log(adjacentList[2][0] + "," + adjacentList[2][1] + "," + adjacentList[2][2]);
             prevHitColliders = hitColliders;
             yield return new WaitForSeconds(1);
         }
@@ -285,6 +370,26 @@ public class Player : MonoBehaviour
             phc.GetComponent<Target>().setInRange(false);
         }
 
+    }
+
+    IEnumerator fadeOut(Image image, float duration)
+    {
+        float counter = 0;
+        //Get current color
+        Color spriteColor = image.color;
+
+        while (counter < duration)
+        {
+            counter += Time.deltaTime;
+            //Fade from 1 to 0
+            float alpha = Mathf.Lerp(1, 0, counter / duration);
+            Debug.Log(alpha);
+
+            //Change alpha only
+            image.color = new Color(spriteColor.r, spriteColor.g, spriteColor.b, alpha);
+            //Wait for a frame
+            yield return null;
+        }
     }
 
     void Attack()
@@ -347,7 +452,12 @@ public class Player : MonoBehaviour
             string vertex2 = hitColliders[parent[i]].name;
             //Debug.Log(vertex2);
             vertexConnections[i].Add(vertex2);
-            vertexConnections[parent[i]].Add(vertex1);
+            
+            
+            if(V > 1) //Kalau Single Vertex gaperlu add parent karena diri dia sendiri
+            {
+                vertexConnections[parent[i]].Add(vertex1);
+            }
         }
         for (int i = 0; i < V; i++)
         {
@@ -360,6 +470,7 @@ public class Player : MonoBehaviour
             //    Debug.Log("-"+vertexConnections[i][j]);
             //}
         }
+        skillPoint -= 75;
 
     }
 

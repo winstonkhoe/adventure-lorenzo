@@ -24,7 +24,7 @@ public class EnemyGun : MonoBehaviour
     public float reloadTime = 1f;
     private bool isReloading = false;
 
-    public float impactForce = 30f;
+    public float impactForce = 0f;
 
     public ParticleSystem[] muzzleFlash;
     public ParticleSystem hitEffect;
@@ -86,6 +86,7 @@ public class EnemyGun : MonoBehaviour
 
     public void ShootPlayer(Transform destination)
     {
+        destination.position = new Vector3(destination.position.x, raycastOrigin.position.y, destination.position.z);
         currentAmmo--;
         foreach (var particle in muzzleFlash)
         {
