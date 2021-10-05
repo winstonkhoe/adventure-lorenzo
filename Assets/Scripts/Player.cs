@@ -103,32 +103,21 @@ public class Player : MonoBehaviour
         }
         if(Input.GetKeyDown(KeyCode.Q))
         {
-<<<<<<< HEAD
             if(onShootingMode)
             {
                 Gun g = GetComponent<Gun>();
-                handleSwitchWeapon(g.primaryWeapon);
+                //handleSwitchWeapon(g.primaryWeapon);
             }
         }
         if(Input.GetKeyDown(KeyCode.E))
         {
             if (onShootingMode)
             {
-                Gun g = GetComponent<Gun>();
-                handleSwitchWeapon(g.secondaryWeapon);
+                //Gun g = GetComponent<Gun>();
+                //handleSwitchWeapon(g.secondaryWeapon);
             }
-=======
             Gun g = GetComponent<Gun>();
             g.currentActiveWeapon = g.secondaryWeapon;
-        }
-        if(Input.GetKeyDown(KeyCode.E))
-        {
-            Gun g = GetComponent<Gun>();
-            g.currentActiveWeapon = g.primaryWeapon;
-<<<<<<< HEAD
->>>>>>> parent of 53877e5 (Several Additional Corrections)
-=======
->>>>>>> parent of 53877e5 (Several Additional Corrections)
         }
 
     }
