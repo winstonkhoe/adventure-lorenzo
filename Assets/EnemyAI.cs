@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class EnemyAI : MonoBehaviour
 {
@@ -30,16 +31,24 @@ public class EnemyAI : MonoBehaviour
     public float attackRange;
     public bool playerInAttackRange;
 
+    public Slider healthBar;
+    public Image Bomb;
+
+    private Target target;
+
     private void Awake()
     {
         player = GameObject.Find("Ken").transform;
         agent = GetComponent<NavMeshAgent>();
+        Bomb.gameObject.SetActive(false);
     }
 
 
     // Start is called before the first frame update
     void Start()
     {
+        target = GetComponent<Target>();
+        healthBar.maxValue = target.health;
         enemyGun = GetComponent<EnemyGun>();
         animator = GetComponent<Animator>();
     }
@@ -47,6 +56,15 @@ public class EnemyAI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(target.getInRange() == true)
+        {
+            Bomb.gameObject.SetActive(true);
+        }
+        else
+        {
+            Bomb.gameObject.SetActive(false);
+        }
+        healthBar.value = target.health;
         playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
         if (!playerInAttackRange) Patroling();
         if (playerInAttackRange) AttackPlayer();
