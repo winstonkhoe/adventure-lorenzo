@@ -13,6 +13,7 @@ public class Gun : MonoBehaviour
         public TrailRenderer tracer;
     }
 
+    public int damageMultiplier = 1;
     public float damage = 10f;
     public float range = 100f;
     public int fireRate = 15; //Primary 15 Secondary 10
@@ -26,7 +27,7 @@ public class Gun : MonoBehaviour
     public float reloadTime = 1f;
     private bool isReloading = false;
 
-    public float impactForce = 30f;
+    public float impactForce = 0f;
 
     public ParticleSystem[] muzzleFlash;
     public ParticleSystem hitEffect;
@@ -98,6 +99,11 @@ public class Gun : MonoBehaviour
 
     }
 
+    public void IncreaseAmmo(int extraAmmo)
+    {
+        currentTotalAmmo += extraAmmo;
+    }
+
     public void UpdateBullets(float deltaTime)
     {
         SimulateBullets(deltaTime);
@@ -134,7 +140,7 @@ public class Gun : MonoBehaviour
             Target t = hitInfo.transform.GetComponent<Target>();
             if(t != null)
             {
-                t.TakeDamage(damage);
+                t.TakeDamage(damage * damageMultiplier);
             }
 
             if(bullet.tracer != null)

@@ -29,10 +29,12 @@ public class Inventory : MonoBehaviour
     private List<Slot> slots;
     public List<InventoryItem> InventoryItemList;
     public List<InventorySlotUI> InventorySlotUIList;
+    public Player player;
     public int inventoryMax = 6;
 
     void Start()
     {
+        player = GetComponent<Player>();
         slots = new List<Slot>(inventoryMax);
         initSlots();
     }
@@ -45,7 +47,6 @@ public class Inventory : MonoBehaviour
         }
         foreach(Slot s in slots)
         {
-            Debug.Log(s);
             s.item = null;
             s.amount = 0;
         }
@@ -71,7 +72,6 @@ public class Inventory : MonoBehaviour
     public void AddItem(string name)
     {
         InventoryItem item = GetItem(name);
-        Debug.Log(item.name);
         bool added = false;
 
         if(item != null)
@@ -104,12 +104,94 @@ public class Inventory : MonoBehaviour
                 }
             }
         }
-        Debug.Log("Selesai Kondisi");
     }
+
+    public void UseItem(int itemSlot)
+    {
+        itemSlot--;
+        Slot use = slots[itemSlot];
+        if (use.item != null)
+        {
+            if(use.item.name.ToLower().Equals("ammo"))
+            {
+                player.useAmmo();
+            }
+            else if(use.item.name.ToLower().Equals("healthpotion"))
+            {
+                player.useHealthPotion();
+            }
+            else if(use.item.name.ToLower().Equals("skillpotion"))
+            {
+                player.useSkillPotion();
+            }
+            else if(use.item.name.ToLower().Equals("shield"))
+            {
+                player.useShield();
+            }
+            else if(use.item.name.ToLower().Equals("painkiller"))
+            {
+                player.usePainKiller();
+            }
+            else if(use.item.name.ToLower().Equals("damage"))
+            {
+                player.useDamageMultiplier();
+            }
+            use.amount--;
+            InventorySlotUIList[itemSlot].amountText.text = use.amount.ToString();
+            if (use.amount <= 0)
+                clearItem(itemSlot);
+        }
+    }
+
+    public void clearItem(int index)
+    {
+        InventoryItem defaultItem = GetItem("Default");
+
+        slots[index].item = null;
+        slots[index].amount = 0;
+        InventorySlotUIList[index].placeholder.sprite = defaultItem.sprite;
+        InventorySlotUIList[index].amountText.text = "0";
+        InventorySlotUIList[index].itemCount.SetActive(false);
+
+    }
+
+    public void updateSlotInventoryPosition()
+    {
+        int gapIndex = slots.Count + 1;
+        for (int i = 0; i < slots.Count; i++)
+        {
+            if(slots[i].item == null)
+            {
+                gapIndex = i;
+            }
+            else if(slots[i].item != null && i > gapIndex)
+            {
+                //Change Position
+                slots[gapIndex].item = slots[i].item;
+                slots[gapIndex].amount = slots[i].amount;
+                InventorySlotUIList[gapIndex].amountText.text = slots[gapIndex].amount.ToString();
+                InventorySlotUIList[gapIndex].placeholder.sprite = InventorySlotUIList[i].placeholder.sprite;
+                InventorySlotUIList[gapIndex].itemCount.gameObject.SetActive(true);
+
+                //Prepare Default
+
+
+                //Clear Value
+                clearItem(i);
+                //slots[i].item = null;
+                //slots[i].amount = 0;
+                //InventorySlotUIList[i].amountText.text = "0";
+                //InventorySlotUIList[i].placeholder.sprite = defaultItem.sprite;
+                //InventorySlotUIList[i].itemCount.SetActive(false);
+                gapIndex = i;
+            }
+        }
+    }
+
 
     // Update is called once per frame
     void Update()
     {
-        
+        updateSlotInventoryPosition();
     }
 }
