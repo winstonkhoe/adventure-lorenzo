@@ -7,11 +7,13 @@ public class MainMenu : MonoBehaviour
 {
     void Start()
     {
+        FindObjectOfType<AudioManager>().Play("Theme");
         //FindObjectOfType<AudioManager>().Play("MenuSong");
     }
 
     public void PlayGame()
     {
+        FindObjectOfType<AudioManager>().InterceptSong("MainGame");
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 

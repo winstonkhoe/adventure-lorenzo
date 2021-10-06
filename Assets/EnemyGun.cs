@@ -24,8 +24,6 @@ public class EnemyGun : MonoBehaviour
     public float reloadTime = 1f;
     private bool isReloading = false;
 
-    public float impactForce = 0f;
-
     public ParticleSystem[] muzzleFlash;
     public ParticleSystem hitEffect;
     public TrailRenderer tracerEffect;
@@ -63,10 +61,8 @@ public class EnemyGun : MonoBehaviour
 
     private float nextTimeToFire = 0f;
 
-    // Update is called once per frame
     void Update()
     {
-
         if (isReloading)
             return;
 
@@ -76,24 +72,19 @@ public class EnemyGun : MonoBehaviour
             return;
         }
 
-        //if (currentAmmo > 0)
-        //{
-        //    //nextTimeToFire = Time.time + 1f / fireRate;
-        //    Shoot();
-        //}
         UpdateBullets(Time.deltaTime);
     }
 
     public void ShootPlayer(Transform destination)
     {
-        destination.position = new Vector3(destination.position.x, raycastOrigin.position.y, destination.position.z);
+        Vector3 newPosition = new Vector3(destination.position.x, raycastOrigin.position.y, destination.position.z);
         currentAmmo--;
         foreach (var particle in muzzleFlash)
         {
             particle.Emit(1);
         }
         FindObjectOfType<AudioManager>().SFXPlay("KyleGunSound");
-        Vector3 velocity = (destination.position - raycastOrigin.position).normalized * bulletSpeed;
+        Vector3 velocity = (newPosition - raycastOrigin.position).normalized * bulletSpeed;
         var bullet = CreateBullet(raycastOrigin.position, velocity);
         bullets.Add(bullet);
     }
@@ -139,41 +130,17 @@ public class EnemyGun : MonoBehaviour
             
             if (bullet.tracer != null)
             {
-                bullet.tracer.transform.position = hitInfo.point;
+                //bullet.tracer.transform.position = hitInfo.point;
             }
             bullet.time = maxLifeTime;
-            //GameObject impactGo = Instantiate(impactEffect, hitInfo.point, Quaternion.LookRotation(hitInfo.normal));
-            //Destroy(impactGo, 2f);
         }
         else
         {
             if (bullet.tracer != null)
             {
-                bullet.tracer.transform.position = end;
+                //bullet.tracer.transform.position = end;
             }
         }
-    }
-    void Shoot()
-    {
-        ////muzzleFlash[0].Play();
-        
-
-        ////Vector2 screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
-        ////ray = Camera.main.ScreenPointToRay(screenCenterPoint);
-
-        //if (Physics.Raycast(hitPoint.position, hitPoint.forward, out hit, range))
-        //{
-        //    Debug.Log(hit.transform.name);
-
-        //    Target target = hit.transform.GetComponent<Target>();
-        //    if(target != null)
-        //    {
-        //        target.TakeDamage(damage);
-        //    }
-
-        //    GameObject impactGo = Instantiate(impactEffect, hit.point, Quaternion.LookRotation(hit.normal));
-        //    Destroy(impactGo, 2f);
-        //}
     }
 
     IEnumerator Reload()

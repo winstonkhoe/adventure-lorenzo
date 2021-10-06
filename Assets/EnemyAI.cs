@@ -19,9 +19,8 @@ public class EnemyAI : MonoBehaviour
     public float damage = 100f;
 
     //Patroling
-    public Vector3 walkPoint;
-    bool walkPointSet;
-    public float walkPointRange;
+    public Transform[] patrolPoints;
+    private int currentPatrolPoint;
 
     //Attacking
     public float timeBetweenAttacks = 0.425f;
@@ -38,13 +37,12 @@ public class EnemyAI : MonoBehaviour
 
     private void Awake()
     {
+        currentPatrolPoint = 0;
         player = GameObject.Find("Ken").transform;
         agent = GetComponent<NavMeshAgent>();
         Bomb.gameObject.SetActive(false);
     }
 
-
-    // Start is called before the first frame update
     void Start()
     {
         target = GetComponent<Target>();
@@ -53,7 +51,6 @@ public class EnemyAI : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         if(target.getInRange() == true)
@@ -72,27 +69,20 @@ public class EnemyAI : MonoBehaviour
 
     private void Patroling()
     {
-        //Debug.Log("Patroling");
-        if (!walkPointSet) SearchWalkPoint();
-        else agent.SetDestination(walkPoint);
+        transform.LookAt(patrolPoints[currentPatrolPoint].position);
+        agent.SetDestination(patrolPoints[currentPatrolPoint].position);
 
-        Vector3 distanceToWalkPoint = transform.position - walkPoint;
+        float distanceToPatrolPoint = Vector3.Distance(transform.position, patrolPoints[currentPatrolPoint].position);
 
-        if(distanceToWalkPoint.magnitude < 1f)
-            walkPointSet = false;
+        if (distanceToPatrolPoint < 1f)
+            changePatrolPoint();
     }
     
-    private void SearchWalkPoint()
+    private void changePatrolPoint()
     {
-        //float randomZ = Random.Range(-walkPointRange, walkPointRange);
-        //float randomX = Random.Range(-walkPointRange, walkPointRange);
-        float randomZ = 20;
-        float randomX = 0;
+        currentPatrolPoint = (currentPatrolPoint + 1) % patrolPoints.Length;
 
-        walkPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
-
-        if (Physics.Raycast(walkPoint, -transform.up, 2f, whatIsGround))
-            walkPointSet = true;
+        transform.LookAt(patrolPoints[currentPatrolPoint].position);
     }
 
     private void AttackPlayer()
@@ -101,35 +91,10 @@ public class EnemyAI : MonoBehaviour
         transform.LookAt(player);
 
         animator.SetBool("isFiring", true);
-        RaycastHit hit;
 
         if (!alreadyAttacked)
         {
             enemyGun.ShootPlayer(player.transform);
-            //Rigidbody rb = Instantiate(projectile, transform.position, Quaternion.identity).GetComponent<Rigidbody>();
-
-            //rb.AddForce(transform.forward * 32f, ForceMode.Impulse);
-            //rb.AddForce(transform.up * 8f, ForceMode.Impulse);
-
-            //if (Physics.Raycast(rb.position, rb.transform.forward, out hit, 5f))
-            //{
-
-            //    Target target = hit.transform.GetComponent<Target>();
-            //    Debug.Log(hit.collider.gameObject.name);
-            //    if (target != null)
-            //    {
-                    
-            //        Debug.Log(target.health);
-            //        target.TakeDamage(damage);
-            //    }
-                
-
-
-            //    //GameObject impactGo = Instantiate(impactEffect, hit.point, Quaternion.LookRotation(hit.normal));
-            //    //Destroy(impactGo, 2f);
-            //}
-            //Debug.Log("Ga Kena!");
-
             alreadyAttacked = true;
             Invoke(nameof(ResetAttack), timeBetweenAttacks);
         }

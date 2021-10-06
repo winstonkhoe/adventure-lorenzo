@@ -23,7 +23,7 @@ public class AudioManager : MonoBehaviour
         {
             s.source = gameObject.AddComponent<AudioSource>();
             s.source.clip = s.clip;
-            s.source.volume = Option.getVolume();
+            s.source.volume = Option.volume;
             s.source.loop = s.loop;
         }
     }
@@ -64,7 +64,7 @@ public class AudioManager : MonoBehaviour
     {
         if (currentlyPlaying != null)
         {
-            currentlyPlaying.source.volume = Option.getVolume();
+            currentlyPlaying.source.volume = Option.volume;
         }
     }
 }

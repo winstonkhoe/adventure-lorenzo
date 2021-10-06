@@ -74,10 +74,6 @@ public class Player : MonoBehaviour
         playerPosition = transform.position;
 
         radiusLine.transform.position = transform.position;
-        //Vector3 to = new Vector3(0, 90, 0);
-        //radiusLine.transform.eulerAngles = Vector3.Lerp(radiusLine.transform.rotation.eulerAngles, to, Time.deltaTime);
-        //Debug.Log("Player position: " + transform.position);
-        //Debug.Log("Radius position: " + radiusLine.transform.position);
 
         if (Input.GetKeyDown(KeyCode.Z))
         {
@@ -115,8 +111,6 @@ public class Player : MonoBehaviour
             inventory.UseItem(6);
         }
     }
-
-
 
     static int minKey(float[] key, bool[] mstSet)
     {
@@ -158,11 +152,9 @@ public class Player : MonoBehaviour
             parent[0] = 0;
         }
 
-        // The MST will have V vertices
         for (int count = 0; count < V - 1; count++)
         {
             int u = minKey(key, mstSet);
-            //Debug.Log("value of u: " + u);
             mstSet[u] = true;
 
             for (int v = 0; v < V; v++)
@@ -175,8 +167,6 @@ public class Player : MonoBehaviour
                 }
             }
         }
-
-        //printMST(parent, graph);
     }
 
     void initRadius()
@@ -303,10 +293,8 @@ public class Player : MonoBehaviour
             {
                 inventory.AddItem(g.name);
             }
-            //Debug.Log(g.name);
             Destroy(g);
         }
-        //DestroyImmediate(g);
     }
 
     void checkRadius()
@@ -321,23 +309,18 @@ public class Player : MonoBehaviour
         int counter = 0;
         while (timeElapsed <= 5)
         {
-            Debug.Log("Loop: " + counter);
             counter++;
             //Debug.Log(Time.time);
             //Debug.Log(Time.deltaTime);
             timeElapsed = currentTime - startTime;
-            Debug.Log(timeElapsed);
-            //Debug.Log(timeElapsed);
             hitColliders = null;
             hitColliders = Physics.OverlapSphere(transform.position, radius, whatIsEnemy);
-            Debug.Log("Amount of enemy: " + hitColliders.Length);
             V = hitColliders.Length;
             if (prevHitColliders != null)
             {
                
                 foreach (var phc in prevHitColliders)
                 {
-                    //Debug.Log(phc.name);
                     bool flagExist = false;
                     foreach (var hc in hitColliders)
                     {
@@ -349,15 +332,12 @@ public class Player : MonoBehaviour
                     }
                     if (!flagExist)
                     {
-                        //Debug.Log(phc.name + " will setToFalse");
                         phc.GetComponent<Target>().setInRange(false);
                     }
                 }
             }
-            //Debug.Log("HitCollider");
             foreach (var h in hitColliders)
             {
-                //Debug.Log(h.name);
                 h.GetComponent<Target>().setInRange(true);
             }
 
@@ -366,7 +346,6 @@ public class Player : MonoBehaviour
         }
         foreach (var phc in prevHitColliders)
         {
-            //Debug.Log(h.name);
             phc.GetComponent<Target>().setInRange(false);
         }
 
@@ -375,19 +354,15 @@ public class Player : MonoBehaviour
     IEnumerator fadeOut(Image image, float duration)
     {
         float counter = 0;
-        //Get current color
         Color spriteColor = image.color;
 
         while (counter < duration)
         {
             counter += Time.deltaTime;
-            //Fade from 1 to 0
             float alpha = Mathf.Lerp(1, 0, counter / duration);
-            Debug.Log(alpha);
 
-            //Change alpha only
             image.color = new Color(spriteColor.r, spriteColor.g, spriteColor.b, alpha);
-            //Wait for a frame
+
             yield return null;
         }
     }
@@ -397,27 +372,19 @@ public class Player : MonoBehaviour
         var adjacentList = new List<List<float>>();
         foreach (var hitCollider in hitColliders)
         {
-            //Debug.Log(counter + " - " + hitCollider.name);
             var adjacentListRow = new List<float>();
             foreach (var h in hitColliders)
             {
-                //Debug.Log("Outer Loop: " + hitCollider.name);
-                //Debug.Log("Inner Loop: " + h.name);
                 float edgeWeight;
                 if (hitCollider.name.Equals(h.name))
                     edgeWeight = 0;
                 else
                 {
-                    //Debug.Log("Masuk Kondisi kedua");
-                    //Debug.Log(h.name + " -" + h.transform.position.x);
-                    //Debug.Log(hitCollider.name + " -" + hitCollider.transform.position.x);
                     edgeWeight = Vector3.Distance(h.transform.position, hitCollider.transform.position);
                 }
-                //Debug.Log(edgeWeight);
                 adjacentListRow.Add(edgeWeight);
             }
             adjacentList.Add(adjacentListRow);
-            //hitCollider.SendMessage("AddDamage");
         }
         primMST(adjacentList);
         GiveElectricDamage();
@@ -431,26 +398,10 @@ public class Player : MonoBehaviour
             vertexConnections.Add(new List<string>());
         }
 
-        //for (int i = 0; i < V; i++)
-        //{
-        //    Debug.Log("Value Parent " + i + " " + parent[i]);
-        //    //Debug.Log(i);
-        //    string vertex1 = hitColliders[i].name;
-        //    //Debug.Log(vertex1);
-        //    string vertex2 = hitColliders[parent[i]].name;
-        //    //Debug.Log(vertex2);
-        //    vertexConnections[i].Add(vertex2);
-        //    vertexConnections[parent[i]].Add(vertex1);
-        //}
-        //int j = 0;
         for (int i = V > 1 ? 1 : 0; i < V; i++)
         {
-            //Debug.Log("Value Parent " + i + " " + parent[i]);
-            //Debug.Log(i);
             string vertex1 = hitColliders[i].name;
-            //Debug.Log(vertex1);
             string vertex2 = hitColliders[parent[i]].name;
-            //Debug.Log(vertex2);
             vertexConnections[i].Add(vertex2);
             
             
@@ -463,12 +414,6 @@ public class Player : MonoBehaviour
         {
             Target t = hitColliders[i].GetComponent<Target>();
             t.TakeDamage(electricDamage * vertexConnections[i].Count);
-            //string vertex1 = hitColliders[i].name;
-            //Debug.Log(vertex1 + " have " + vertexConnections[i].Count + " connected vertex :");
-            //for(int j = 0; j < vertexConnections[i].Count; j++)
-            //{
-            //    Debug.Log("-"+vertexConnections[i][j]);
-            //}
         }
         skillPoint -= 75;
 
