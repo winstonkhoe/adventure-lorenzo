@@ -24,7 +24,7 @@ public class DoorController : MonoBehaviour
             if(name.ToLower().Contains("underground"))
             {
                 Player p = other.GetComponent<Player>();
-                if(p.coreItemOwned < 8)
+                if(p.coreItemOwned < 9)
                 {
                     CreateMessage cm = FindObjectOfType<CreateMessage>();
                     cm.createMessage("NOT ENOUGH CORE ITEM");

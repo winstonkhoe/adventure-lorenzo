@@ -27,7 +27,7 @@ public class Target : MonoBehaviour
         if(gameObject.tag.Equals("Enemy") && droppedCoreItem == false)
         {
             droppedCoreItem = true;
-            Debug.Log("Keluarin Core Item");
+            //Debug.Log("Keluarin Core Item");
             //Instantiate(coreItem, new Vector3(controller.transform.position.x, controller.transform.position.y, controller.transform.position.z), Quaternion.identity);
             Instantiate(coreItem, controller.transform.position, Quaternion.identity);
             //Instantiate(coreItem, controller.transform, true);

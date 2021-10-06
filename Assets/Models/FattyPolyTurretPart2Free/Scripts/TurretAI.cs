@@ -123,7 +123,7 @@ public class TurretAI : MonoBehaviour {
     {
         //shotScript.Shoot(currentTarget);
         Shoot(currentTarget);
-        //Debug.Log("We shoot some stuff!");
+        ////Debug.Log("We shoot some stuff!");
     }
     
     Vector3 CalculateVelocity(Vector3 target, Vector3 origen, float time)

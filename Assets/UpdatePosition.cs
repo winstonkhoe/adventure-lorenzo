@@ -10,8 +10,8 @@ public class UpdatePosition : MonoBehaviour
     void Start()
     {
         player.transform.position = transform.position;
-        Debug.Log("Outer: " + transform.position);
-        Debug.Log(player.name + ": " + player.transform.position);
+        //Debug.Log("Outer: " + transform.position);
+        //Debug.Log(player.name + ": " + player.transform.position);
     }
 
     // Update is called once per frame

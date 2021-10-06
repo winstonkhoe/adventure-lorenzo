@@ -64,7 +64,7 @@ public class EnemyAI : MonoBehaviour
         healthBar.value = target.health;
         playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
         if (!playerInAttackRange) Patroling();
-        if (playerInAttackRange) AttackPlayer();
+        if (playerInAttackRange && !animator.GetBool("isDead")) AttackPlayer();
     }
 
     private void Patroling()

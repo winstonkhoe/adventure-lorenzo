@@ -179,7 +179,7 @@ public class Gun : MonoBehaviour
 
         //if (Physics.Raycast(hitPoint.position, hitPoint.forward, out hit, range))
         //{
-        //    Debug.Log(hit.transform.name);
+        //    //Debug.Log(hit.transform.name);
 
         //    Target target = hit.transform.GetComponent<Target>();
         //    if(target != null)

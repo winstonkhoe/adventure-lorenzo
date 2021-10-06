@@ -122,7 +122,7 @@ public class Option : MonoBehaviour
 
     public static void SaveSystemData()
     {
-        Debug.Log("Save Data");
+        //Debug.Log("Save Data");
         SaveSystem.SaveSystemData();
     }
 

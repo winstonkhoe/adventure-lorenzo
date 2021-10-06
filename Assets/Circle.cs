@@ -25,7 +25,7 @@ public class Circle : MonoBehaviour
         lineRenderer = GetComponent<LineRenderer>();
         //player = GameObject.Find("Ken");
         //centerPosition = player.transform.position;
-        //Debug.Log(centerPosition);
+        ////Debug.Log(centerPosition);
         //SetupCircle();
     }
 

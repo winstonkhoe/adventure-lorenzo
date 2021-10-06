@@ -90,7 +90,7 @@ public class Player : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Z))
         {
-            //Debug.Log("Z Kepencet");
+            ////Debug.Log("Z Kepencet");
             //radiusLine.b
             if (checkEnemyInRange == true)
             {
@@ -132,11 +132,11 @@ public class Player : MonoBehaviour
         float min = float.MaxValue;
         int min_index = -1;
 
-        Debug.Log("Value min: " + min);
+        //Debug.Log("Value min: " + min);
 
         for (int v = 0; v < V; v++)
         {
-            Debug.Log(key[v]);
+            //Debug.Log(key[v]);
             if (mstSet[v] == false && key[v] < min)
             {
                 min = key[v];
@@ -173,8 +173,8 @@ public class Player : MonoBehaviour
         for (int count = 0; count < V - 1; count++)
         {
             int u = minKey(key, mstSet);
-            Debug.Log(u);
-            Debug.Log(mstSet[u]);
+            //Debug.Log(u);
+            //Debug.Log(mstSet[u]);
             mstSet[u] = true;
 
             for (int v = 0; v < V; v++)
@@ -305,7 +305,7 @@ public class Player : MonoBehaviour
         {
             if (g.name.Contains("CoreItem"))
             {
-                //Debug.Log("Masuk");
+                ////Debug.Log("Masuk");
                 coreItemOwned++;
             }
             //Inventory
@@ -330,8 +330,8 @@ public class Player : MonoBehaviour
         while (timeElapsed <= 5)
         {
             counter++;
-            //Debug.Log(Time.time);
-            //Debug.Log(Time.deltaTime);
+            ////Debug.Log(Time.time);
+            ////Debug.Log(Time.deltaTime);
             timeElapsed = Time.time - startTime;
             hitColliders = null;
             hitColliders = Physics.OverlapSphere(transform.position, radius, whatIsEnemy);
@@ -391,7 +391,7 @@ public class Player : MonoBehaviour
     {
         hitColliders = Physics.OverlapSphere(transform.position, radius, whatIsEnemy);
         V = hitColliders.Length;
-        Debug.Log(V);
+        //Debug.Log(V);
         var adjacentList = new List<List<float>>();
         foreach (var hitCollider in hitColliders)
         {
@@ -405,7 +405,7 @@ public class Player : MonoBehaviour
                 {
                     edgeWeight = Vector3.Distance(h.transform.position, hitCollider.transform.position);
                 }
-                Debug.Log(hitCollider.name + " - " + h.name + " with weight " + edgeWeight);
+                //Debug.Log(hitCollider.name + " - " + h.name + " with weight " + edgeWeight);
                 adjacentListRow.Add(edgeWeight);
             }
             adjacentList.Add(adjacentListRow);

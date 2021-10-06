@@ -13,7 +13,7 @@ public class MainMenu : MonoBehaviour
 
     public void PlayGame()
     {
-        FindObjectOfType<AudioManager>().InterceptSong("MainGame");
+        FindObjectOfType<AudioManager>().InterceptSong("PinkSoldier");
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 

@@ -80,8 +80,8 @@ public class Inventory : MonoBehaviour
             {
                 if(!added)
                 {
-                    //Debug.Log(item.name);
-                    //Debug.Log(slots[i].item);
+                    ////Debug.Log(item.name);
+                    ////Debug.Log(slots[i].item);
                     //Kosong
 
                     if (slots[i].item == null)
