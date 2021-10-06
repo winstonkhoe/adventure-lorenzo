@@ -18,6 +18,7 @@ public class Player : MonoBehaviour
 
     //Special Skill
     //Radius
+    public GameObject lightningEffect;
     public int segments = 40;
     public float xradius = 10f;
     public float yradius = 10f;
@@ -426,9 +427,18 @@ public class Player : MonoBehaviour
             string vertex1 = hitColliders[i].name;
             string vertex2 = hitColliders[parent[i]].name;
             vertexConnections[i].Add(vertex2);
-            
-            
-            if(V > 1) //Kalau Single Vertex gaperlu add parent karena diri dia sendiri
+
+
+
+
+            GameObject lightning = Instantiate(lightningEffect, hitColliders[parent[i]].transform.position, Quaternion.identity);
+            DigitalRuby.LightningBolt.LightningBoltScript lightningScript = lightning.GetComponent<DigitalRuby.LightningBolt.LightningBoltScript>();
+            lightningScript.StartObject = hitColliders[parent[i]].gameObject;
+            lightningScript.EndObject = hitColliders[i].gameObject;
+            lightningScript.Duration = 5f;
+            Destroy(lightning, 6f);
+
+            if (V > 1) //Kalau Single Vertex gaperlu add parent karena diri dia sendiri
             {
                 vertexConnections[parent[i]].Add(vertex1);
             }

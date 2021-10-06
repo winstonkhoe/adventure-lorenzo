@@ -21,7 +21,6 @@ public class CharacterAiming : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         if(Input.GetMouseButtonDown(1) == true)
@@ -39,6 +38,6 @@ public class CharacterAiming : MonoBehaviour
         cameraLookAt.eulerAngles = new Vector3(yAxis.Value, xAxis.Value, 0);
 
         float yawCamera = mainCamera.transform.rotation.eulerAngles.y;
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, yawCamera, 0), turnSpeed * Time.fixedDeltaTime);
+        //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, yawCamera, 0), turnSpeed * Time.fixedDeltaTime);
     }
 }

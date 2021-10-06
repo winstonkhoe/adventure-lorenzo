@@ -5,6 +5,7 @@ using UnityEngine;
 public class ThirdPersonMovement : PlayerController
 {
     Animator animator;
+    public GameObject crosshairPlacement;
     public Transform cam;
 
     public float speed = 6f;
@@ -21,15 +22,9 @@ public class ThirdPersonMovement : PlayerController
 
     protected override void Update()
     {
-        Vector3 mouseWorldPosition = Vector3.zero;
-        Vector2 screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
         if(animator.GetBool("isAiming"))
         {
-            Vector3 worldAimTarget = mouseWorldPosition;
-            worldAimTarget.y = transform.position.y;
-            Vector3 aimDirection = (worldAimTarget - transform.position).normalized;
-
-            transform.forward = Vector3.Lerp(transform.forward, aimDirection, Time.deltaTime * 20f);
+            transform.forward = Vector3.Lerp(transform.forward, crosshairPlacement.transform.forward, Time.deltaTime * 3f);
         }
 
         float horizontal = Input.GetAxisRaw("Horizontal");
