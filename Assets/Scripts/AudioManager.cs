@@ -1,7 +1,7 @@
 using System;
 using UnityEngine.Audio;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 public class AudioManager : MonoBehaviour
 {
     public Sound[] sounds;
@@ -30,7 +30,7 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
-        Play("Theme");    
+        Play("PinkSoldier");
     }
 
     public void Play(string name)

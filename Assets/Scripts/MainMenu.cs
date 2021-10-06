@@ -7,7 +7,7 @@ public class MainMenu : MonoBehaviour
 {
     void Start()
     {
-        FindObjectOfType<AudioManager>().Play("Theme");
+        FindObjectOfType<AudioManager>().Play("MenuSong");
         //FindObjectOfType<AudioManager>().Play("MenuSong");
     }
 

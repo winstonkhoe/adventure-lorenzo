@@ -83,7 +83,7 @@ public class Gun : MonoBehaviour
         if (isReloading)
             return;
 
-        if (currentTotalAmmo > 0 && (clipAmmo <= 0 || Input.GetKeyDown(KeyCode.R)))
+        if (currentTotalAmmo > 0 && (clipAmmo <= 0 || (Input.GetKeyDown(KeyCode.R) && clipAmmo != clipSize)))
         {
             StartCoroutine(Reload());
             return;
@@ -196,6 +196,9 @@ public class Gun : MonoBehaviour
     IEnumerator Reload()
     {
         isReloading = true;
+
+        CreateMessage cm = FindObjectOfType<CreateMessage>();
+        cm.createMessage("Reloading", reloadTime);
 
         int filledAmmo;
 

@@ -10,19 +10,41 @@ public class DoorController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(reachTunnel == false)
+        if(other.tag.Equals("Player"))
         {
-            reachTunnel = true;
-            FindObjectOfType<AudioManager>().InterceptSong("Tunnel");
+            if(reachTunnel == false)
+            {
+                reachTunnel = true;
+                FindObjectOfType<AudioManager>().InterceptSong("Tunnel");
+            }
+            if(name.ToLower().Contains("victory"))
+            {
+                FindObjectOfType<AudioManager>().InterceptSong("");
+            }
+            if(name.ToLower().Contains("underground"))
+            {
+                Player p = other.GetComponent<Player>();
+                if(p.coreItemOwned < 8)
+                {
+                    CreateMessage cm = FindObjectOfType<CreateMessage>();
+                    cm.createMessage("NOT ENOUGH CORE ITEM");
+                    //CreateMessage.createMessage("NOT ENOUGH CORE ITEM");
+                }
+                else
+                {
+                    doorAnimator.SetBool("character_nearby", true);
+                }
+            }
+
         }
-        Debug.Log("TriggerEnter");
-        doorAnimator.SetBool("character_nearby", true);
     }
 
     private void OnTriggerExit(Collider other)
     {
-        Debug.Log("TriggerExit");
-        doorAnimator.SetBool("character_nearby", false);
+        if (other.tag.Equals("Player"))
+        {
+            doorAnimator.SetBool("character_nearby", false);
+        }
     }
 
     void Start()

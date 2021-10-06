@@ -76,11 +76,8 @@ public class Inventory : MonoBehaviour
 
         if(item != null)
         {
-            Debug.Log("Masuk Kondisi");
-            Debug.Log(slots.Count);
             for(int i = 0; i < slots.Count; i++)
             {
-                Debug.Log("Masuk Loop");
                 if(!added)
                 {
                     //Debug.Log(item.name);
@@ -89,7 +86,6 @@ public class Inventory : MonoBehaviour
 
                     if (slots[i].item == null)
                     {
-                        Debug.Log("Masuk Null");
                         added = true;
                         slots[i].item = item;
                         InventorySlotUIList[i].placeholder.sprite = item.sprite;

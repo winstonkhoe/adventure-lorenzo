@@ -8,13 +8,20 @@ using UnityEngine.UI;
 public class Player : MonoBehaviour
 {
     //Time
-    float currentTime;
+    string fmt = "00";
+    private float startTime;
+    private float elapsedTime;
+    private int minute;
+    private int second;
+    LinkedList<int> time;
+    public TMPro.TextMeshProUGUI timeText;
 
     //Special Skill
     //Radius
     public int segments = 40;
     public float xradius = 10f;
     public float yradius = 10f;
+    public float radius = 10f;
 
     private bool checkEnemyInRange = false;
     Vector3 playerPosition;
@@ -43,7 +50,7 @@ public class Player : MonoBehaviour
 
     //CoreItem
     public TMPro.TextMeshProUGUI coreItemText;
-    private int coreItemOwned = 0;
+    public int coreItemOwned = 0;
 
     //Inventory
     Inventory inventory;
@@ -56,6 +63,7 @@ public class Player : MonoBehaviour
     
     void Start()
     {
+        startTime = Time.time;
         inventory = GetComponent<Inventory>();
         playerGun = GetComponent<Gun>();
         shield.SetActive(false);
@@ -66,7 +74,11 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        currentTime = Time.time;
+        elapsedTime = Time.time - startTime;
+        second = (int)elapsedTime % 60;
+        minute = (int)((elapsedTime - second) / 60);
+        timeText.text = minute.ToString(fmt) + ":" + second.ToString(fmt);
+
         ammoText.text = playerGun.AmmoText();
         coreItemText.text = "CORE ITEM: 0" + coreItemOwned + "/09";
         healthBar.value = healthPoint;
@@ -84,7 +96,7 @@ public class Player : MonoBehaviour
                 Attack();
             }
             StartCoroutine(turnOnRadiusLine());
-            StartCoroutine(ThunderEffectCheckEnemy(transform.position, 10f));
+            StartCoroutine(ThunderEffectCheckEnemy(transform.position));
         }
         if (Input.GetKeyDown(KeyCode.Keypad1) || Input.GetKeyDown(KeyCode.Alpha1))
         {
@@ -119,12 +131,17 @@ public class Player : MonoBehaviour
         float min = float.MaxValue;
         int min_index = -1;
 
+        Debug.Log("Value min: " + min);
+
         for (int v = 0; v < V; v++)
+        {
+            Debug.Log(key[v]);
             if (mstSet[v] == false && key[v] < min)
             {
                 min = key[v];
                 min_index = v;
             }
+        }
 
         return min_index;
     }
@@ -155,6 +172,8 @@ public class Player : MonoBehaviour
         for (int count = 0; count < V - 1; count++)
         {
             int u = minKey(key, mstSet);
+            Debug.Log(u);
+            Debug.Log(mstSet[u]);
             mstSet[u] = true;
 
             for (int v = 0; v < V; v++)
@@ -299,12 +318,12 @@ public class Player : MonoBehaviour
 
     void checkRadius()
     {
-        ThunderEffectCheckEnemy(playerPosition, 10f);
+        ThunderEffectCheckEnemy(playerPosition);
     }
 
-    IEnumerator ThunderEffectCheckEnemy(Vector3 center, float radius)
+    IEnumerator ThunderEffectCheckEnemy(Vector3 center)
     {
-        float startTime = currentTime;
+        float startTime = Time.time;
         float timeElapsed = 0;
         int counter = 0;
         while (timeElapsed <= 5)
@@ -312,7 +331,7 @@ public class Player : MonoBehaviour
             counter++;
             //Debug.Log(Time.time);
             //Debug.Log(Time.deltaTime);
-            timeElapsed = currentTime - startTime;
+            timeElapsed = Time.time - startTime;
             hitColliders = null;
             hitColliders = Physics.OverlapSphere(transform.position, radius, whatIsEnemy);
             V = hitColliders.Length;
@@ -342,7 +361,7 @@ public class Player : MonoBehaviour
             }
 
             prevHitColliders = hitColliders;
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(0);
         }
         foreach (var phc in prevHitColliders)
         {
@@ -369,6 +388,9 @@ public class Player : MonoBehaviour
 
     void Attack()
     {
+        hitColliders = Physics.OverlapSphere(transform.position, radius, whatIsEnemy);
+        V = hitColliders.Length;
+        Debug.Log(V);
         var adjacentList = new List<List<float>>();
         foreach (var hitCollider in hitColliders)
         {
@@ -382,6 +404,7 @@ public class Player : MonoBehaviour
                 {
                     edgeWeight = Vector3.Distance(h.transform.position, hitCollider.transform.position);
                 }
+                Debug.Log(hitCollider.name + " - " + h.name + " with weight " + edgeWeight);
                 adjacentListRow.Add(edgeWeight);
             }
             adjacentList.Add(adjacentListRow);
