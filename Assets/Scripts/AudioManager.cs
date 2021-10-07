@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 public class AudioManager : MonoBehaviour
 {
     public Sound[] sounds;
-    public Sound currentlyPlaying;
+    public Sound currentlyPlaying = null;
 
 
     public static AudioManager instance;
@@ -30,6 +30,7 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
+        currentlyPlaying = null;
     }
 
     public void Play(string name)
@@ -56,6 +57,14 @@ public class AudioManager : MonoBehaviour
             currentlyPlaying.source.Stop();
         }
         Play(name);
+    }
+
+    public void clearSong()
+    {
+        if(currentlyPlaying != null)
+        {
+            currentlyPlaying.source.Stop();
+        }
     }
 
     // Update is called once per frame

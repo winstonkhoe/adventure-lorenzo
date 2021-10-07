@@ -16,8 +16,6 @@ public class CharacterAiming : MonoBehaviour
     void Start()
     {
         mainCamera = Camera.main;
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
         animator = GetComponent<Animator>();
     }
 

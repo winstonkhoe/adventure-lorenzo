@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
-
+using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -27,7 +27,8 @@ public class Player : MonoBehaviour
     private bool checkEnemyInRange = false;
     Vector3 playerPosition;
 
-    //Attack  
+    //Attack
+    List<GameObject> vertex;
     Collider[] hitColliders;
     Collider[] prevHitColliders;
     public Image attackedEffect;
@@ -46,7 +47,6 @@ public class Player : MonoBehaviour
     public LayerMask whatIsEnemy;
 
     //Ammo
-
     public TMPro.TextMeshProUGUI ammoText;
 
     //CoreItem
@@ -60,10 +60,14 @@ public class Player : MonoBehaviour
     private static int V = 5;
     static int[] parent;
 
-
+    
     
     void Start()
     {
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        pauseUICanvas.SetActive(false);
+        isPause = false;
         startTime = Time.time;
         inventory = GetComponent<Inventory>();
         playerGun = GetComponent<Gun>();
@@ -123,7 +127,48 @@ public class Player : MonoBehaviour
         {
             inventory.UseItem(6);
         }
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            PauseGame();
+        }
+
     }
+
+    #region PauseGame
+
+    private bool isPause;
+    public GameObject pauseUICanvas;
+
+    private void PauseGame()
+    {
+        if (!isPause)
+        {
+            isPause = true;
+            pauseUICanvas.SetActive(true);
+            Time.timeScale = 0;
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+        }
+    }
+
+    public void ResumeGame()
+    {
+        Debug.Log("Resume");
+        pauseUICanvas.SetActive(false);
+        Time.timeScale = 1;
+        isPause = false;
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+
+    public void StopGame()
+    {
+        Time.timeScale = 1;
+        FindObjectOfType<AudioManager>().clearSong();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+    }
+
+    #endregion
 
     static int minKey(float[] key, bool[] mstSet)
     {
@@ -389,21 +434,31 @@ public class Player : MonoBehaviour
 
     void Attack()
     {
+        vertex.Clear();
+
         hitColliders = Physics.OverlapSphere(transform.position, radius, whatIsEnemy);
-        V = hitColliders.Length;
+
+        foreach(Collider c in hitColliders)
+        {
+            vertex.Add(c.gameObject);
+        }
+        vertex.Add(gameObject);
+
+        V = vertex.Count;
+
         //Debug.Log(V);
         var adjacentList = new List<List<float>>();
-        foreach (var hitCollider in hitColliders)
+        foreach (var i in vertex)
         {
             var adjacentListRow = new List<float>();
-            foreach (var h in hitColliders)
+            foreach(var j in vertex)
             {
                 float edgeWeight;
-                if (hitCollider.name.Equals(h.name))
+                if (i.name.Equals(j.name))
                     edgeWeight = 0;
                 else
                 {
-                    edgeWeight = Vector3.Distance(h.transform.position, hitCollider.transform.position);
+                    edgeWeight = Vector3.Distance(j.transform.position, i.transform.position);
                 }
                 //Debug.Log(hitCollider.name + " - " + h.name + " with weight " + edgeWeight);
                 adjacentListRow.Add(edgeWeight);
@@ -427,8 +482,6 @@ public class Player : MonoBehaviour
             string vertex1 = hitColliders[i].name;
             string vertex2 = hitColliders[parent[i]].name;
             vertexConnections[i].Add(vertex2);
-
-
 
 
             GameObject lightning = Instantiate(lightningEffect, hitColliders[parent[i]].transform.position, Quaternion.identity);
