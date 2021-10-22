@@ -10,6 +10,7 @@ public class EnemyAI : MonoBehaviour
     public bool inPosition;
 
     public Transform player;
+    public Transform diePosition;
     public NavMeshAgent agent;
 
     public LayerMask whatIsGround, whatIsPlayer;
@@ -107,7 +108,7 @@ public class EnemyAI : MonoBehaviour
     {
         animator.SetBool("isDead", true);
         //controller.Move(new Vector3(0, -5f).normalized * Time.deltaTime);
-        Vector3 destinationDrop = new Vector3(transform.position.x - 5, transform.position.y, transform.position.z);
+        Vector3 destinationDrop = new Vector3(transform.position.x, transform.position.y - 2, transform.position.z);
         if (gameObject.tag.Equals("Enemy") && droppedCoreItem == false)
         {
             droppedCoreItem = true;
@@ -121,7 +122,8 @@ public class EnemyAI : MonoBehaviour
         GenerateEnemy ge = FindObjectOfType<GenerateEnemy>();
         Debug.Log("Enemy at patrolIndex " + patrolIndex + " is Dead");
         ge.cleanPatroliExist(gameObject.name, patrolIndex, spawnDelay);
-        transform.Translate(destinationDrop * Time.deltaTime, Space.World);
+        Vector3.Lerp(transform.position, diePosition.position, 2);
+        //transform.Translate(destinationDrop * Time.deltaTime, Space.World);
         Destroy(gameObject, 4f);
     }
     #endregion
