@@ -12,14 +12,18 @@ public class DoorController : MonoBehaviour
     {
         if(other.tag.Equals("Player"))
         {
-            if(reachTunnel == false)
-            {
-                reachTunnel = true;
-                FindObjectOfType<AudioManager>().InterceptSong("Tunnel");
-            }
+            
             if(name.ToLower().Contains("victory"))
             {
                 FindObjectOfType<AudioManager>().InterceptSong("");
+            }
+            if(name.ToLower().Contains("meetboss"))
+            {
+                if (reachTunnel == false)
+                {
+                    reachTunnel = true;
+                    FindObjectOfType<AudioManager>().InterceptSong("Tunnel");
+                }
             }
             if(name.ToLower().Contains("underground"))
             {
@@ -35,7 +39,6 @@ public class DoorController : MonoBehaviour
                     doorAnimator.SetBool("character_nearby", true);
                 }
             }
-
         }
     }
 
