@@ -9,8 +9,10 @@ public class MechMovement : PlayerController
     public GameObject crosshairPlacement;
     public Transform cam;
 
+    public GameObject player;
     public float speed = 6f;
-
+    public TMPro.TextMeshProUGUI ammoText;
+    Gun mechGun;
     public float turnSmoothTime = 0.1f;
     float turnSmoothVelocity;
     public bool overriden;
@@ -18,6 +20,7 @@ public class MechMovement : PlayerController
 
     protected override void Start()
     {
+        mechGun = GetComponent<Gun>();
         overriden = false;
         controller = GetComponent<CharacterController>();
         velocity.y = 0;
@@ -29,6 +32,13 @@ public class MechMovement : PlayerController
     {
         if(overriden)
         {
+            if(Input.GetKeyDown(KeyCode.F))
+            {
+                overriden = false;
+                player.SetActive(true);
+                player.transform.position = transform.position;
+            }
+            ammoText.text = mechGun.AmmoText();
             cameraVirtual.gameObject.SetActive(true);
             float horizontal = Input.GetAxisRaw("Horizontal");
             float vertical = Input.GetAxisRaw("Vertical");

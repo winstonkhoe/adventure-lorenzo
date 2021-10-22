@@ -72,12 +72,12 @@ MonoBehaviour:
   - name: MenuSong
     clip: {fileID: 8300000, guid: bc6f7619b139f1b489c62c310bcfb65a, type: 3}
     volume: 0.117
-    loop: 0
+    loop: 1
     source: {fileID: 0}
   - name: PinkSoldier
     clip: {fileID: 8300000, guid: 6020bae81f3a60f4f9b3d06f6e3efb9b, type: 3}
     volume: 0.117
-    loop: 0
+    loop: 1
     source: {fileID: 0}
   currentlyPlaying:
     name: 

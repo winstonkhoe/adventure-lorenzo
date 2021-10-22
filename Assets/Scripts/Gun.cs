@@ -72,8 +72,11 @@ public class Gun : MonoBehaviour
     }
     void Start()
     {
-        currentActiveWeapon.currentTotalAmmo = currentActiveWeapon.maxAmmo - currentActiveWeapon.clipSize;
-        currentActiveWeapon.clipAmmo = currentActiveWeapon.clipSize;
+        foreach (Weapon w in weaponList)
+        {
+            w.currentTotalAmmo = w.maxAmmo - w.clipSize;
+            w.clipAmmo = w.clipSize;
+        }
     }
 
     public void switchWeapon()
@@ -141,7 +144,6 @@ public class Gun : MonoBehaviour
 
         if (Input.GetButton("Fire1") && Time.time >= nextTimeToFire && currentActiveWeapon.clipAmmo > 0)
         {
-            Debug.Log("Shooting");
             nextTimeToFire = Time.time + 1f / currentActiveWeapon.fireRate;
             Shoot();
         }

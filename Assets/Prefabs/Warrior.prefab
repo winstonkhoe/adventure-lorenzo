@@ -2322,7 +2322,9 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   attackRange: 10
+  chaseRange: 13
   playerInAttackRange: 0
+  playerInChaseRange: 0
   timeBetweenAttacks: 0.5
   damage: 20
 --- !u!114 &4151043888935040804
