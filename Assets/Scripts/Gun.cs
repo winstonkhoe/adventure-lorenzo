@@ -2,9 +2,32 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class Gun : MonoBehaviour
 {
+    public enum GunOwned
+    {
+        Single = 1,
+        Dual = 2,
+        Catapult = 3,
+    }
+
+    [System.Serializable]
+    public class Weapon
+    {
+        public GameObject weaponObject;
+        public string weaponName;
+        public int clipSize;
+        public int maxAmmo;
+        public int clipAmmo;
+        public int currentTotalAmmo;
+        public int fireRate; //Primary 15 Secondary 10
+        public int bulletSpeed;
+        public int bulletDrop;
+        public int damage;
+    }
+
     class Bullet
     {
         public float time;
@@ -14,20 +37,15 @@ public class Gun : MonoBehaviour
     }
 
     public int damageMultiplier = 1;
-    public float damage = 10f;
+    
     public float range = 100f;
-    public int fireRate = 15; //Primary 15 Secondary 10
-    public float bulletSpeed = 40f;
-    public float bulletDrop = 10f;
 
-    public int maxAmmo = 150;
-    private int currentTotalAmmo;
-    private int clipAmmo;
-    private int clipSize = 30;
+
+    public Weapon[] weaponList;
+    public Weapon currentActiveWeapon, primaryWeapon, secondaryWeapon;
+
     public float reloadTime = 1f;
     private bool isReloading = false;
-
-    public float impactForce = 0f;
 
     public ParticleSystem[] muzzleFlash;
     public ParticleSystem hitEffect;
@@ -35,24 +53,56 @@ public class Gun : MonoBehaviour
     public Transform raycastOrigin;
     public Transform raycastDestination;
 
+    public TMPro.TextMeshProUGUI weaponText;
+
     //public GameObject impactEffect;
 
-    
 
     Ray ray;
     RaycastHit hitInfo;
     List<Bullet> bullets = new List<Bullet>();
     float maxLifeTime = 3f;
 
+    void Awake()
+    {
+        currentActiveWeapon = weaponList[0];
+        primaryWeapon = getWeapon("primary");
+        secondaryWeapon = getWeapon("secondary");
+        //Debug.Log(currentActiveWeapon.weaponObject.transform.position);
+    }
     void Start()
     {
-        currentTotalAmmo = maxAmmo - clipSize;
-        clipAmmo = clipSize;
+        currentActiveWeapon.currentTotalAmmo = currentActiveWeapon.maxAmmo - currentActiveWeapon.clipSize;
+        currentActiveWeapon.clipAmmo = currentActiveWeapon.clipSize;
+    }
+
+    public void switchWeapon()
+    {
+        if(currentActiveWeapon == primaryWeapon)
+        {
+            currentActiveWeapon = secondaryWeapon;
+        }
+        else
+        {
+            currentActiveWeapon = primaryWeapon;
+        }
+    }
+
+    private Weapon getWeapon(string name)
+    {
+        foreach(Weapon w in weaponList)
+        {
+            if (w.weaponName.ToLower().Contains(name.ToLower()))
+            {
+                return w;
+            }
+        }
+        return null;
     }
 
     Vector3 GetPosition(Bullet bullet)
     {
-        Vector3 gravity = Vector3.down * bulletDrop;
+        Vector3 gravity = Vector3.down * currentActiveWeapon.bulletDrop;
         return bullet.initialPosition + (bullet.initialVelocity * bullet.time) + (0.5f * gravity * bullet.time * bullet.time);
     }
 
@@ -73,7 +123,7 @@ public class Gun : MonoBehaviour
 
     public string AmmoText()
     {
-        return clipAmmo.ToString() + '|' + currentTotalAmmo.ToString();
+        return currentActiveWeapon.clipAmmo.ToString() + '|' + currentActiveWeapon.currentTotalAmmo.ToString();
     }
 
     // Update is called once per frame
@@ -83,25 +133,31 @@ public class Gun : MonoBehaviour
         if (isReloading)
             return;
 
-        if (currentTotalAmmo > 0 && (clipAmmo <= 0 || (Input.GetKeyDown(KeyCode.R) && clipAmmo != clipSize)))
+        if (currentActiveWeapon.currentTotalAmmo > 0 && (currentActiveWeapon.clipAmmo <= 0 || (Input.GetKeyDown(KeyCode.R) && currentActiveWeapon.clipAmmo != currentActiveWeapon.clipSize)))
         {
             StartCoroutine(Reload());
             return;
         }
 
-        if (Input.GetButton("Fire1") && Time.time >= nextTimeToFire && clipAmmo > 0)
+        if (Input.GetButton("Fire1") && Time.time >= nextTimeToFire && currentActiveWeapon.clipAmmo > 0)
         {
-            nextTimeToFire = Time.time + 1f / fireRate;
+            Debug.Log("Shooting");
+            nextTimeToFire = Time.time + 1f / currentActiveWeapon.fireRate;
             Shoot();
         }
         UpdateBullets(Time.deltaTime);
 
+        weaponText.text = currentActiveWeapon.weaponName;
+    }
 
+    public GameObject getCurrentWeapon()
+    {
+        return currentActiveWeapon.weaponObject;
     }
 
     public void IncreaseAmmo(int extraAmmo)
     {
-        currentTotalAmmo += extraAmmo;
+        currentActiveWeapon.currentTotalAmmo += extraAmmo;
     }
 
     public void UpdateBullets(float deltaTime)
@@ -137,12 +193,17 @@ public class Gun : MonoBehaviour
             hitEffect.transform.forward = hitInfo.normal;
             hitEffect.Emit(1);
 
-            Target t = hitInfo.transform.GetComponent<Target>();
-            if(t != null)
+            if(hitInfo.transform.tag == "Enemy")
             {
-                t.TakeDamage(damage * damageMultiplier);
-            }
+                EnemyAI enemy = hitInfo.transform.GetComponent<EnemyAI>();
 
+                if (enemy != null)
+                {
+                    enemy.TakeDamage(currentActiveWeapon.damage * damageMultiplier);
+                }
+
+            }
+            
             if(bullet.tracer != null)
             {
                 bullet.tracer.transform.position = hitInfo.point;
@@ -161,35 +222,16 @@ public class Gun : MonoBehaviour
     }
     void Shoot()
     {
-        clipAmmo--;
+        currentActiveWeapon.clipAmmo--;
         foreach (var particle in muzzleFlash)
         {
             particle.Emit(1);
         }
-        Vector3 velocity = (raycastDestination.position - raycastOrigin.position).normalized * bulletSpeed;
+        Vector3 velocity = (raycastDestination.position - raycastOrigin.position).normalized * currentActiveWeapon.bulletSpeed;
         var bullet = CreateBullet(raycastOrigin.position, velocity);
         bullets.Add(bullet);
         
-        
-        ////muzzleFlash[0].Play();
         FindObjectOfType<AudioManager>().SFXPlay("PrimaryGunSound");
-
-        ////Vector2 screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
-        ////ray = Camera.main.ScreenPointToRay(screenCenterPoint);
-
-        //if (Physics.Raycast(hitPoint.position, hitPoint.forward, out hit, range))
-        //{
-        //    //Debug.Log(hit.transform.name);
-
-        //    Target target = hit.transform.GetComponent<Target>();
-        //    if(target != null)
-        //    {
-        //        target.TakeDamage(damage);
-        //    }
-
-        //    GameObject impactGo = Instantiate(impactEffect, hit.point, Quaternion.LookRotation(hit.normal));
-        //    Destroy(impactGo, 2f);
-        //}
 
     }
 
@@ -204,29 +246,19 @@ public class Gun : MonoBehaviour
 
         yield return new WaitForSeconds(reloadTime);
 
-        int ammoNeeded = clipSize - clipAmmo;
+        int ammoNeeded = currentActiveWeapon.clipSize - currentActiveWeapon.clipAmmo;
 
-        if (ammoNeeded > currentTotalAmmo)
+        if (ammoNeeded > currentActiveWeapon.currentTotalAmmo)
         {
-            filledAmmo = currentTotalAmmo;
+            filledAmmo = currentActiveWeapon.currentTotalAmmo;
         }
         else
         {
             filledAmmo = ammoNeeded;
         }
-        clipAmmo += filledAmmo;
-        currentTotalAmmo -= filledAmmo;
+        currentActiveWeapon.clipAmmo += filledAmmo;
+        currentActiveWeapon.currentTotalAmmo -= filledAmmo;
 
-        //if (currentTotalAmmo < clipSize)
-        //{
-        //    filledAmmo = currentTotalAmmo;
-        //}
-        //else
-        //{
-        //    filledAmmo = clipSize;
-        //}
-        //clipAmmo = filledAmmo;
-        //currentTotalAmmo -= filledAmmo;
         isReloading = false;
     }
 }

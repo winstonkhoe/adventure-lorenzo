@@ -52,7 +52,7 @@ public class AudioManager : MonoBehaviour
 
     public void InterceptSong(string name)
     {
-        if(currentlyPlaying != null)
+        if(currentlyPlaying.source != null)
         {
             currentlyPlaying.source.Stop();
         }
@@ -61,7 +61,7 @@ public class AudioManager : MonoBehaviour
 
     public void clearSong()
     {
-        if(currentlyPlaying != null)
+        if(currentlyPlaying.source != null)
         {
             currentlyPlaying.source.Stop();
         }
@@ -70,6 +70,9 @@ public class AudioManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(currentlyPlaying != null && !currentlyPlaying.source.isPlaying)
+            currentlyPlaying = null;
+
         if (currentlyPlaying != null)
         {
             currentlyPlaying.source.volume = Option.volume;

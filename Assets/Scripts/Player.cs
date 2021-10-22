@@ -4,104 +4,62 @@ using System.Threading;
 using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
-
+using UnityEngine.Animations.Rigging;
 public class Player : MonoBehaviour
 {
     //Time
     string fmt = "00";
-    private float startTime;
-    private float elapsedTime;
-    private int minute;
-    private int second;
-    LinkedList<int> time;
-    public TMPro.TextMeshProUGUI timeText;
+    
 
-    //Special Skill
-    //Radius
-    public GameObject lightningEffect;
-    public int segments = 40;
-    public float xradius = 10f;
-    public float yradius = 10f;
-    public float radius = 10f;
-
-    private bool checkEnemyInRange = false;
     Vector3 playerPosition;
 
-    //Attack
-    List<GameObject> vertex;
-    Collider[] hitColliders;
-    Collider[] prevHitColliders;
     public Image attackedEffect;
-    public float electricDamage = 125f;
-
-    //Bar Values
-    public int healthPoint = 1000;
-    private int extraHealth = 0;
-    public int skillPoint = 200;
-    public Slider healthBar;
-    public Slider skillBar;
+    
 
     Gun playerGun;
-    public LineRenderer radiusLine;
+    
 
     public LayerMask whatIsEnemy;
 
-    //Ammo
-    public TMPro.TextMeshProUGUI ammoText;
-
-    //CoreItem
-    public TMPro.TextMeshProUGUI coreItemText;
-    public int coreItemOwned = 0;
-
-    //Inventory
-    Inventory inventory;
-    public GameObject shield;
-
-    private static int V = 5;
-    static int[] parent;
-
-    
+    public DialogueTrigger dialogueTrigger;
     
     void Start()
     {
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
-        pauseUICanvas.SetActive(false);
-        isPause = false;
-        startTime = Time.time;
-        inventory = GetComponent<Inventory>();
+        //initGamePlay();
         playerGun = GetComponent<Gun>();
+        inventory = GetComponent<Inventory>();
+
+        initPlayer();
+        dialogueTrigger.TriggerDialogue();
+
+        startTime = Time.time;
+        initializeUIMenu();
         shield.SetActive(false);
-        healthBar.maxValue = healthPoint;
-        skillBar.maxValue = skillPoint;
-        initRadius();
+
+        initSpecialEffect();
     }
 
     void Update()
     {
-        elapsedTime = Time.time - startTime;
-        second = (int)elapsedTime % 60;
-        minute = (int)((elapsedTime - second) / 60);
-        timeText.text = minute.ToString(fmt) + ":" + second.ToString(fmt);
+        if(healthPoint <= 0)
+        {
+            playerDeath();
+        }
 
-        ammoText.text = playerGun.AmmoText();
-        coreItemText.text = "CORE ITEM: 0" + coreItemOwned + "/09";
-        healthBar.value = healthPoint;
-        skillBar.value = skillPoint;
+        updateUIMenu();
+
         playerPosition = transform.position;
 
         radiusLine.transform.position = transform.position;
 
         if (Input.GetKeyDown(KeyCode.Z))
         {
-            ////Debug.Log("Z Kepencet");
-            //radiusLine.b
             if (checkEnemyInRange == true)
             {
-                Attack();
+                PerformSpecialEffect();
             }
             StartCoroutine(turnOnRadiusLine());
-            StartCoroutine(ThunderEffectCheckEnemy(transform.position));
+            StartCoroutine(SetBombUIEnemyInRadius(transform.position));
         }
         if (Input.GetKeyDown(KeyCode.Keypad1) || Input.GetKeyDown(KeyCode.Alpha1))
         {
@@ -131,13 +89,227 @@ public class Player : MonoBehaviour
         {
             PauseGame();
         }
+        if(Input.GetKeyDown(KeyCode.C))
+        {
+            onShootingMode = !onShootingMode;
+            if(onShootingMode)
+            {
+                ShootingMode();
+            }
+            else
+            {
+                ExplorationMode();
+            }
+        }
+        if(Input.GetKeyDown(KeyCode.Q))
+        {
+            Gun g = GetComponent<Gun>();
+            g.currentActiveWeapon = g.secondaryWeapon;
+        }
+        if(Input.GetKeyDown(KeyCode.E))
+        {
+            Gun g = GetComponent<Gun>();
+            g.currentActiveWeapon = g.primaryWeapon;
+        }
 
     }
 
-    #region PauseGame
+    #region Game Play
+
+    private void initGamePlay()
+    {
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+
+    #endregion
+
+    #region Player
+
+    private Transform weaponParent;
+    private Transform originalGunPosition;
+    public Transform rightHand;
+    public Transform leftHand;
+    public Transform rightPocket;
+    public Transform leftPocket;
+
+    CharacterController playerController;
+    CharacterController tempController;
+
+    Animator animator;
+
+    public int healthPoint = 1000;
+    public int skillPoint = 200;
+    public int coreItemOwned = 0;
+    public bool onShootingMode = false;
+    private void initPlayer()
+    {
+        //healthPoint = 1000;
+        //skillPoint = 200;
+        animator = GetComponent<Animator>();
+        Gun g = GetComponent<Gun>();
+        playerController = GetComponent<CharacterController>();
+        GameObject weapon = g.currentActiveWeapon.weaponObject;
+        weaponParent = weapon.transform.parent;
+        originalGunPosition = weapon.transform;
+        ExplorationMode();
+    }
+
+    private void playerDeath()
+    {
+        animator.SetBool("isDead", true);
+        DeathCanvas();
+    }
+
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        GameObject g = hit.gameObject;
+        if (g.tag.Equals("Item"))
+        {
+            if (g.name.Contains("CoreItem"))
+            {
+                coreItemOwned++;
+            }
+            //Inventory
+            else
+            {
+                inventory.AddItem(g.name);
+            }
+            Destroy(g);
+        }
+        else if(g.tag.Equals("Enemy"))
+        {
+            CreateMessage cm = FindObjectOfType<CreateMessage>();
+            cm.createMessage("Press F to Override MECH");
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                Debug.Log("Masuk");
+                gameObject.SetActive(false);             
+                g.GetComponent<MechMovement>().overriden = true;
+                //CharacterController enemy = g.GetComponent<CharacterController>();
+                //GetComponent<ThirdPersonMovement>().controller = enemy;
+                
+            }
+        }
+    }
+
+        #region Player Animations
+        
+        public Rig rig;
+
+        private void ExplorationMode()
+        {
+            Gun g = GetComponent<Gun>();
+            GameObject weapon = g.currentActiveWeapon.weaponObject;
+            if(weapon.Equals(g.primaryWeapon.weaponObject))
+            {
+                StartCoroutine(SmoothRig(1, 0, weapon, rightHand, rightHand, rightPocket, rightPocket));
+            }
+            else
+            {
+                StartCoroutine(SmoothRig(1, 0, weapon, leftHand, leftHand, leftPocket, leftPocket));
+            }
+            
+            //weapon.transform.parent = rightPocket;
+            //weapon.transform.position = rightPocket.transform.position;
+            //weapon.transform.rotation = rightPocket.transform.rotation;
+        }
+
+        private void ShootingMode()
+        {
+            Gun g = GetComponent<Gun>();
+            GameObject weapon = g.currentActiveWeapon.weaponObject;
+            //weapon.transform.parent = rightHand;
+            //weapon.transform.position = rightHand.transform.position;
+            if (weapon.Equals(g.primaryWeapon.weaponObject))
+            {
+                StartCoroutine(SmoothRig(0, 1, weapon, rightHand, rightHand, weaponParent, originalGunPosition));
+            }
+            else
+            {
+                StartCoroutine(SmoothRig(0, 1, weapon, leftHand, leftHand, weaponParent, originalGunPosition));
+            }
+            //weapon.transform.position = originalGunPosition.position;
+            //weapon.transform.rotation = originalGunPosition.rotation;
+        }
+
+        IEnumerator SmoothRig(float start, float end, GameObject obj, Transform startPosParent, Transform startPos, Transform endPosParent, Transform endPos)
+
+        {
+            float elapsedTime = 0;
+            float waitTime = 0.2f;
+
+            obj.transform.parent = startPosParent;
+            obj.transform.position = startPos.transform.position;
+
+            while (elapsedTime < waitTime)
+
+            {
+                rig.weight = Mathf.Lerp(start, end, (elapsedTime / waitTime));
+
+                elapsedTime += Time.deltaTime;
+
+                yield return null;
+
+            }
+
+            obj.transform.parent = endPosParent;
+            obj.transform.position = endPos.transform.position;
+            obj.transform.rotation = endPos.transform.rotation;
+        }
+
+        #endregion 
+
+    #endregion
+
+
+
+
+
+
+    #region UICanvas
 
     private bool isPause;
+    public GameObject playerUICanvas;
     public GameObject pauseUICanvas;
+    public GameObject deathUICanvas;
+    public GameObject victoryUICanvas;
+
+    public Slider healthBar;
+    public Slider skillBar;
+
+    public TMPro.TextMeshProUGUI ammoText;
+    public TMPro.TextMeshProUGUI coreItemText;
+    public TMPro.TextMeshProUGUI timeText;
+    public TMPro.TextMeshProUGUI victoryText;
+
+    private float startTime;
+    private float elapsedTime;
+    private int minute;
+    private int second;
+
+    private void initializeUIMenu()
+    {
+        pauseUICanvas.SetActive(false);
+        deathUICanvas.SetActive(false);
+        isPause = false;
+        healthBar.maxValue = healthPoint;
+        skillBar.maxValue = skillPoint;
+    }
+
+    private void updateUIMenu()
+    {
+        //elapsedTime = Time.time - startTime;
+        //second = (int)elapsedTime % 60;
+        //minute = (int)((elapsedTime - second) / 60);
+        //timeText.text = minute.ToString(fmt) + ":" + second.ToString(fmt);
+
+        ammoText.text = playerGun.AmmoText();
+        //ammoText.text = "30";
+        coreItemText.text = "CORE ITEM: " + coreItemOwned.ToString(fmt) + "/09";
+        healthBar.value = healthPoint;
+        skillBar.value = skillPoint;
+    }
 
     private void PauseGame()
     {
@@ -151,9 +323,21 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void DeathCanvas()
+    {
+        playerUICanvas.SetActive(false);
+        deathUICanvas.SetActive(true);
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+    }
+
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 0);
+    }
+
     public void ResumeGame()
     {
-        Debug.Log("Resume");
         pauseUICanvas.SetActive(false);
         Time.timeScale = 1;
         isPause = false;
@@ -161,7 +345,16 @@ public class Player : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
     }
 
-    public void StopGame()
+    private void VictoryCanvas()
+    {
+        playerUICanvas.SetActive(false);
+        victoryText.text = "Finished In " + minute.ToString(fmt) + ":" + second.ToString(fmt);
+        victoryUICanvas.SetActive(true);
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+    }
+
+    public void MainMenu()
     {
         Time.timeScale = 1;
         FindObjectOfType<AudioManager>().clearSong();
@@ -170,96 +363,274 @@ public class Player : MonoBehaviour
 
     #endregion
 
-    static int minKey(float[] key, bool[] mstSet)
-    {
 
-        // Initialize min value
-        float min = float.MaxValue;
-        int min_index = -1;
 
-        //Debug.Log("Value min: " + min);
 
-        for (int v = 0; v < V; v++)
+
+
+
+
+    #region Special Effect - Prim's Algorithm
+
+    //PRIM
+    List<GameObject> vertex;
+    Collider[] hitColliders, prevHitColliders;
+    private static int V = 5;
+    static int[] parent;
+    
+    //Effect
+    public GameObject lightningEffect;
+
+    //Radius Visualization
+    public LineRenderer radiusLine;
+    public int segments = 40;
+    public float xradius = 10f;
+    public float yradius = 10f;
+    public float radius = 10f;
+    private bool checkEnemyInRange = false;
+
+    //Damage
+    public int electricDamage = 125;
+
+    #region Special Effect Radius
+
+    void initSpecialEffect()
         {
-            //Debug.Log(key[v]);
-            if (mstSet[v] == false && key[v] < min)
+            vertex = new List<GameObject>();
+            initRadius();
+        }
+
+        void initRadius()
+        {
+            radiusLine.positionCount = segments + 1;
+            //radiusLine.SetVertexCount(segments + 1);
+            radiusLine.useWorldSpace = false;
+            CreatePoints();
+            radiusLine.gameObject.SetActive(false);
+        }
+
+        void CreatePoints()
+        {
+            float x;
+            float y = 0f;
+            float z;
+
+            float angle = 20f;
+
+            for (int i = 0; i < (segments + 1); i++)
             {
-                min = key[v];
-                min_index = v;
+                x = Mathf.Sin(Mathf.Deg2Rad * angle) * xradius;
+                z = Mathf.Cos(Mathf.Deg2Rad * angle) * yradius;
+
+                radiusLine.SetPosition(i, new Vector3(x, y, z));
+
+                angle += (360f / segments);
             }
         }
 
-        return min_index;
-    }
-
-    static void primMST(List<List<float>> graph)
-    {
-
-        parent = new int[V];
-
-        float[] key = new float[V];
-
-        bool[] mstSet = new bool[V];
-
-        for (int i = 0; i < V; i++)
+        IEnumerator turnOnRadiusLine()
         {
-            key[i] = float.MaxValue;
-            mstSet[i] = false;
+            checkEnemyInRange = true;
+            radiusLine.gameObject.SetActive(true);
+
+            yield return new WaitForSeconds(5);
+
+            radiusLine.gameObject.SetActive(false);
+            checkEnemyInRange = false;
         }
 
-        key[0] = 0;
-        parent[0] = -1;
-
-        if (V < 2)
+        IEnumerator SetBombUIEnemyInRadius(Vector3 center)
         {
-            parent[0] = 0;
+            float startTime = Time.time;
+            float timeElapsed = 0;
+            while (timeElapsed <= 5)
+            {
+                timeElapsed = Time.time - startTime;
+                hitColliders = null;
+                hitColliders = Physics.OverlapSphere(transform.position, radius, whatIsEnemy);
+                V = hitColliders.Length;
+                if (prevHitColliders != null)
+                {
+                    foreach (var phc in prevHitColliders)
+                    {
+                        bool flagExist = false;
+                        foreach (var hc in hitColliders)
+                        {
+                            if (phc.Equals(hc))
+                            {
+                                flagExist = true;
+                                break;
+                            }
+                        }
+                        if (!flagExist)
+                        {
+                            phc.GetComponent<EnemyAI>().setInRange(false);
+                        }
+                    }
+                }
+                foreach (var h in hitColliders)
+                {
+                    h.GetComponent<EnemyAI>().setInRange(true);
+                }
+
+                prevHitColliders = hitColliders;
+                yield return new WaitForSeconds(0);
+            }
+            foreach (var phc in prevHitColliders)
+            {
+                phc.GetComponent<EnemyAI>().setInRange(false);
+            }
         }
+        #endregion
 
-        for (int count = 0; count < V - 1; count++)
+        #region Special Effect Algorithm
+
+        static int minKey(float[] key, bool[] mstSet)
         {
-            int u = minKey(key, mstSet);
-            //Debug.Log(u);
-            //Debug.Log(mstSet[u]);
-            mstSet[u] = true;
+            // Initialize min value
+            float min = float.MaxValue;
+            int min_index = -1;
 
             for (int v = 0; v < V; v++)
             {
-                if (((List<float>)graph[u])[v] != 0 && mstSet[v] == false
-                    && ((List<float>)graph[u])[v] < key[v])
+                if (mstSet[v] == false && key[v] < min)
                 {
-                    parent[v] = u;
-                    key[v] = ((List<float>)graph[u])[v];
+                    min = key[v];
+                    min_index = v;
+                }
+            }
+            return min_index;
+        }
+
+        static void primMST(List<List<float>> graph)
+        {
+
+            parent = new int[V];
+
+            float[] key = new float[V];
+
+            bool[] mstSet = new bool[V];
+
+            for (int i = 0; i < V; i++)
+            {
+                key[i] = float.MaxValue;
+                mstSet[i] = false;
+            }
+
+            key[0] = 0;
+            parent[0] = -1;
+
+            if (V < 2)
+            {
+                parent[0] = 0;
+            }
+
+            for (int count = 0; count < V - 1; count++)
+            {
+                int u = minKey(key, mstSet);
+                //Debug.Log(u);
+                //Debug.Log(mstSet[u]);
+                mstSet[u] = true;
+
+                for (int v = 0; v < V; v++)
+                {
+                    if (((List<float>)graph[u])[v] != 0 && mstSet[v] == false
+                        && ((List<float>)graph[u])[v] < key[v])
+                    {
+                        parent[v] = u;
+                        key[v] = ((List<float>)graph[u])[v];
+                    }
                 }
             }
         }
-    }
 
-    void initRadius()
-    {
-        radiusLine.SetVertexCount(segments + 1);
-        radiusLine.useWorldSpace = false;
-        CreatePoints();
-        radiusLine.gameObject.SetActive(false);
-    }
-
-    void CreatePoints()
-    {
-        float x;
-        float y = 0f;
-        float z;
-
-        float angle = 20f;
-
-        for (int i = 0; i < (segments + 1); i++)
+        void GiveElectricDamageAndLightningStrike()
         {
-            x = Mathf.Sin(Mathf.Deg2Rad * angle) * xradius;
-            z = Mathf.Cos(Mathf.Deg2Rad * angle) * yradius;
+            List<List<string>> vertexConnections = new List<List<string>>(V);
+            for (int i = 0; i < V; i++)
+            {
+                vertexConnections.Add(new List<string>());
+            }
 
-            radiusLine.SetPosition(i, new Vector3(x, y, z));
+            for (int i = V > 1 ? 1 : 0; i < V; i++)
+            {
+                string vertex1 = vertex[i].name;
+                string vertex2 = vertex[parent[i]].name;
+                vertexConnections[i].Add(vertex2);
 
-            angle += (360f / segments);
+
+                GameObject lightning = Instantiate(lightningEffect, vertex[parent[i]].transform.position, Quaternion.identity);
+                DigitalRuby.LightningBolt.LightningBoltScript lightningScript = lightning.GetComponent<DigitalRuby.LightningBolt.LightningBoltScript>();
+                lightningScript.StartObject = vertex[parent[i]].gameObject;
+                lightningScript.EndObject = vertex[i].gameObject;
+                //lightningScript.Duration = 5f;
+                Destroy(lightning, 6f);
+
+                if (V > 1) //Kalau Single Vertex gaperlu add parent karena diri dia sendiri
+                {
+                    vertexConnections[parent[i]].Add(vertex1);
+                }
+            }
+            for (int i = 0; i < V; i++)
+            {
+                if (vertex[i].tag != "Player")
+                {
+                EnemyAI t = vertex[i].GetComponent<EnemyAI>();
+                    t.TakeDamage(electricDamage * vertexConnections[i].Count);
+                }
+            }
+            skillPoint -= 75;
         }
-    }
+        void PerformSpecialEffect()
+        {
+            if (vertex.Count > 0)
+                vertex.Clear();
+
+            var adjacentList = new List<List<float>>();
+            makeAdjacencyList(adjacentList);
+            primMST(adjacentList);
+            GiveElectricDamageAndLightningStrike();
+        }
+
+        void makeAdjacencyList(List<List<float>> adjacentList)
+        {
+            hitColliders = Physics.OverlapSphere(transform.position, radius, whatIsEnemy);
+
+            foreach (Collider c in hitColliders)
+            {
+                vertex.Add(c.gameObject);
+            }
+            vertex.Add(gameObject);
+
+            V = vertex.Count;
+
+            foreach (var i in vertex)
+            {
+                var adjacentListRow = new List<float>();
+                foreach (var j in vertex)
+                {
+                    float edgeWeight;
+                    if (i.Equals(j))
+                        edgeWeight = 0;
+                    else
+                        edgeWeight = Vector3.Distance(j.transform.position, i.transform.position);
+                    adjacentListRow.Add(edgeWeight);
+                }
+                adjacentList.Add(adjacentListRow);
+            }
+        }
+
+        #endregion
+
+
+    #endregion
+
+
+
+    #region Inventory
+
+    Inventory inventory;
+    public GameObject shield;
 
     public void useAmmo()
     {
@@ -295,9 +666,6 @@ public class Player : MonoBehaviour
     {
         int prevHealth = healthPoint;
         healthPoint += 450;
-        
-        yield return new WaitForSeconds(1);
-        healthPoint -= 90;
 
         yield return new WaitForSeconds(1);
         healthPoint -= 90;
@@ -307,11 +675,14 @@ public class Player : MonoBehaviour
 
         yield return new WaitForSeconds(1);
         healthPoint -= 90;
-        
+
         yield return new WaitForSeconds(1);
         healthPoint -= 90;
-        
-        if(healthPoint >= prevHealth)
+
+        yield return new WaitForSeconds(1);
+        healthPoint -= 90;
+
+        if (healthPoint >= prevHealth)
         {
             healthPoint = prevHealth;
         }
@@ -321,7 +692,7 @@ public class Player : MonoBehaviour
     {
         shield.SetActive(true);
 
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(7);
 
         shield.SetActive(false);
     }
@@ -335,85 +706,15 @@ public class Player : MonoBehaviour
         playerGun.damageMultiplier /= 2;
     }
 
+    #endregion
+
+    
     public void gotHit(int damage)
     {
         healthPoint -= damage;
         Color spriteColor = attackedEffect.color;
         attackedEffect.color = new Color(spriteColor.r, spriteColor.g, spriteColor.b, 100);
         StartCoroutine(fadeOut(attackedEffect, 5f));
-    }
-
-    void OnControllerColliderHit(ControllerColliderHit hit)
-    {
-        GameObject g = hit.gameObject;
-        if (g.tag.Equals("Item"))
-        {
-            if (g.name.Contains("CoreItem"))
-            {
-                ////Debug.Log("Masuk");
-                coreItemOwned++;
-            }
-            //Inventory
-            else
-            {
-                inventory.AddItem(g.name);
-            }
-            Destroy(g);
-        }
-    }
-
-    void checkRadius()
-    {
-        ThunderEffectCheckEnemy(playerPosition);
-    }
-
-    IEnumerator ThunderEffectCheckEnemy(Vector3 center)
-    {
-        float startTime = Time.time;
-        float timeElapsed = 0;
-        int counter = 0;
-        while (timeElapsed <= 5)
-        {
-            counter++;
-            ////Debug.Log(Time.time);
-            ////Debug.Log(Time.deltaTime);
-            timeElapsed = Time.time - startTime;
-            hitColliders = null;
-            hitColliders = Physics.OverlapSphere(transform.position, radius, whatIsEnemy);
-            V = hitColliders.Length;
-            if (prevHitColliders != null)
-            {
-               
-                foreach (var phc in prevHitColliders)
-                {
-                    bool flagExist = false;
-                    foreach (var hc in hitColliders)
-                    {
-                        if (phc.name.Equals(hc.name))
-                        {
-                            flagExist = true;
-                            break;
-                        }
-                    }
-                    if (!flagExist)
-                    {
-                        phc.GetComponent<Target>().setInRange(false);
-                    }
-                }
-            }
-            foreach (var h in hitColliders)
-            {
-                h.GetComponent<Target>().setInRange(true);
-            }
-
-            prevHitColliders = hitColliders;
-            yield return new WaitForSeconds(0);
-        }
-        foreach (var phc in prevHitColliders)
-        {
-            phc.GetComponent<Target>().setInRange(false);
-        }
-
     }
 
     IEnumerator fadeOut(Image image, float duration)
@@ -432,87 +733,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    void Attack()
-    {
-        vertex.Clear();
+    
 
-        hitColliders = Physics.OverlapSphere(transform.position, radius, whatIsEnemy);
-
-        foreach(Collider c in hitColliders)
-        {
-            vertex.Add(c.gameObject);
-        }
-        vertex.Add(gameObject);
-
-        V = vertex.Count;
-
-        //Debug.Log(V);
-        var adjacentList = new List<List<float>>();
-        foreach (var i in vertex)
-        {
-            var adjacentListRow = new List<float>();
-            foreach(var j in vertex)
-            {
-                float edgeWeight;
-                if (i.name.Equals(j.name))
-                    edgeWeight = 0;
-                else
-                {
-                    edgeWeight = Vector3.Distance(j.transform.position, i.transform.position);
-                }
-                //Debug.Log(hitCollider.name + " - " + h.name + " with weight " + edgeWeight);
-                adjacentListRow.Add(edgeWeight);
-            }
-            adjacentList.Add(adjacentListRow);
-        }
-        primMST(adjacentList);
-        GiveElectricDamage();
-    }
-
-    void GiveElectricDamage()
-    {
-        List<List<string>> vertexConnections = new List<List<string>>(V);
-        for (int i = 0; i < V; i++)
-        {
-            vertexConnections.Add(new List<string>());
-        }
-
-        for (int i = V > 1 ? 1 : 0; i < V; i++)
-        {
-            string vertex1 = hitColliders[i].name;
-            string vertex2 = hitColliders[parent[i]].name;
-            vertexConnections[i].Add(vertex2);
-
-
-            GameObject lightning = Instantiate(lightningEffect, hitColliders[parent[i]].transform.position, Quaternion.identity);
-            DigitalRuby.LightningBolt.LightningBoltScript lightningScript = lightning.GetComponent<DigitalRuby.LightningBolt.LightningBoltScript>();
-            lightningScript.StartObject = hitColliders[parent[i]].gameObject;
-            lightningScript.EndObject = hitColliders[i].gameObject;
-            lightningScript.Duration = 5f;
-            Destroy(lightning, 6f);
-
-            if (V > 1) //Kalau Single Vertex gaperlu add parent karena diri dia sendiri
-            {
-                vertexConnections[parent[i]].Add(vertex1);
-            }
-        }
-        for (int i = 0; i < V; i++)
-        {
-            Target t = hitColliders[i].GetComponent<Target>();
-            t.TakeDamage(electricDamage * vertexConnections[i].Count);
-        }
-        skillPoint -= 75;
-
-    }
-
-    IEnumerator turnOnRadiusLine()
-    {
-        checkEnemyInRange = true;
-        radiusLine.gameObject.SetActive(true);
-
-        yield return new WaitForSeconds(5);
-
-        radiusLine.gameObject.SetActive(false);
-        checkEnemyInRange = false;
-    }
+    
 }

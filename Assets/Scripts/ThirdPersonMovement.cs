@@ -5,6 +5,7 @@ using UnityEngine;
 public class ThirdPersonMovement : PlayerController
 {
     Animator animator;
+    Player player;
     public GameObject crosshairPlacement;
     public Transform cam;
 
@@ -18,6 +19,7 @@ public class ThirdPersonMovement : PlayerController
         controller = GetComponent<CharacterController>();
         velocity.y = 0;
         animator = GetComponent<Animator>();
+        player = GetComponent<Player>();
     }
 
     protected override void Update()
@@ -44,7 +46,16 @@ public class ThirdPersonMovement : PlayerController
             animator.SetBool("isWalking", true);
             float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
             float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
-            transform.rotation = Quaternion.Euler(0f, angle, 0f);
+            if(!player.onShootingMode)
+            {
+                transform.rotation = Quaternion.Euler(0f, angle, 0f);
+            }
+            else
+            {
+                targetAngle = cam.eulerAngles.y;
+                angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
+                transform.rotation = Quaternion.Euler(0f, angle, 0f);
+            }
 
             Vector3 moveDirection = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
             controller.Move(moveDirection.normalized * speed * Time.deltaTime);

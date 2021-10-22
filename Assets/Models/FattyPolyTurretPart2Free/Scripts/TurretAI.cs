@@ -50,6 +50,7 @@ public class TurretAI : MonoBehaviour {
     }
 	
 	void Update () {
+        //ChackForTarget();
         if (currentTarget != null)
         {
             FollowTarget();
@@ -100,6 +101,7 @@ public class TurretAI : MonoBehaviour {
                     currentTarget = colls[i].gameObject;
                     distAway = dist;
                 }
+                Debug.Log(colls[i].name+" in range");
             }
         }
     }

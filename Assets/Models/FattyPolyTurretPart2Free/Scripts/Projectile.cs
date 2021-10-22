@@ -116,6 +116,6 @@ public class Projectile : MonoBehaviour {
     public void Explosion()
     {
         Instantiate(explosion, transform.position, transform.rotation);
-        Destroy(gameObject);
+        Destroy(gameObject, 5f);
     }
 }
