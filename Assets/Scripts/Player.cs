@@ -117,7 +117,7 @@ public class Player : MonoBehaviour
                 //handleSwitchWeapon(g.secondaryWeapon);
             }
             Gun g = GetComponent<Gun>();
-            g.currentActiveWeapon = g.secondaryWeapon;
+            handleSwitchWeapon(g.secondaryWeapon);
         }
 
     }
@@ -203,7 +203,24 @@ public class Player : MonoBehaviour
 
         #region Player Animations
         
-        public Rig rig;
+        public Rig primaryWeaponRig;
+        public Rig secondaryWeaponRig;
+        
+        private void putGunInPocket()
+        {
+            Gun g = GetComponent<Gun>();
+            Transform primaryWeapon = g.primaryWeapon.weaponObject.transform;
+            Transform secondaryWeapon = g.secondaryWeapon.weaponObject.transform;
+
+            primaryWeapon.parent = rightPocket;
+            secondaryWeapon.parent = leftPocket;
+
+            primaryWeapon.position = rightPocket.position;
+            secondaryWeapon.position = leftPocket.position;
+
+            primaryWeapon.rotation = rightPocket.rotation;
+            secondaryWeapon.rotation = leftPocket.rotation;
+        }
 
         private void ExplorationMode()
         {
@@ -221,6 +238,17 @@ public class Player : MonoBehaviour
             //weapon.transform.parent = rightPocket;
             //weapon.transform.position = rightPocket.transform.position;
             //weapon.transform.rotation = rightPocket.transform.rotation;
+        }
+
+        private void handleSwitchWeapon(Gun.Weapon w)
+        {
+            Gun g = GetComponent<Gun>();
+            if(!g.currentActiveWeapon.Equals(w))
+            {
+                ExplorationMode();
+                g.currentActiveWeapon = w;
+                ShootingMode();
+            }
         }
 
         private void ShootingMode()
