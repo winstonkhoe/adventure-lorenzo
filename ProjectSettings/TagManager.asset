@@ -7,7 +7,6 @@ TagManager:
   - Shootable
   - Enemy
   - Item
-  - Spaceship
   layers:
   - Default
   - TransparentFX

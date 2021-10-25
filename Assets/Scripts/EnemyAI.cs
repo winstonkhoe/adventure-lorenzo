@@ -47,8 +47,6 @@ public class EnemyAI : MonoBehaviour
         }
         healthBar.value = health;
         playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
-        playerInChaseRange = Physics.CheckSphere(transform.position, chaseRange, whatIsPlayer);
-        if (inPosition && playerInChaseRange && !playerInAttackRange) ChasePlayer();
         if (inPosition && !playerInAttackRange) Patroling();
         if (playerInAttackRange && !animator.GetBool("isDead")) AttackPlayer();
     }
@@ -159,11 +157,7 @@ public class EnemyAI : MonoBehaviour
 
     //States
     public float attackRange;
-    public float chaseRange;
-
     public bool playerInAttackRange;
-    public bool playerInChaseRange;
-
     public float timeBetweenAttacks = 0.425f;
     public float damage = 100f;
     private void AttackPlayer()
@@ -186,14 +180,6 @@ public class EnemyAI : MonoBehaviour
             alreadyAttacked = true;
             Invoke(nameof(ResetAttack), timeBetweenAttacks);
         }
-    }
-
-    private void ChasePlayer()
-    {
-        float playerHeight = player.GetComponent<Collider>().bounds.size.y;
-        Vector3 newLook = new Vector3(player.position.x, player.position.y + playerHeight / 2, player.position.z);
-        transform.LookAt(newLook);
-        agent.SetDestination(player.position);
     }
 
     private void ResetAttack()

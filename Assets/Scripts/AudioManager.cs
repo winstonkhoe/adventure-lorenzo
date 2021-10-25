@@ -11,8 +11,6 @@ public class AudioManager : MonoBehaviour
     public static AudioManager instance;
     void Awake()
     {
-        currentlyPlaying = new Sound();
-        currentlyPlaying.name = "empty";
         if (instance == null)
             instance = this;
         else
@@ -32,7 +30,7 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
-        currentlyPlaying.name = "empty";
+        currentlyPlaying = null;
     }
 
     public void Play(string name)
@@ -42,7 +40,6 @@ public class AudioManager : MonoBehaviour
             return;
         currentlyPlaying = s;
         s.source.Play();
-        Debug.Log("Play Song: " + name);
     }
 
     public void SFXPlay(string name)
@@ -51,7 +48,6 @@ public class AudioManager : MonoBehaviour
         if (s == null)
             return;
         s.source.Play();
-        Debug.Log("Play SFX: " + name);
     }
 
     public void InterceptSong(string name)
@@ -68,20 +64,16 @@ public class AudioManager : MonoBehaviour
         if(currentlyPlaying.source != null)
         {
             currentlyPlaying.source.Stop();
-            currentlyPlaying.name = "empty";
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(!currentlyPlaying.name.Equals("empty") && !currentlyPlaying.source.isPlaying)
-        {
+        if(currentlyPlaying != null && !currentlyPlaying.source.isPlaying)
             currentlyPlaying = null;
-            currentlyPlaying.name = "empty";
-        }
 
-        if (!currentlyPlaying.name.Equals("empty"))
+        if (currentlyPlaying != null)
         {
             currentlyPlaying.source.volume = Option.volume;
         }

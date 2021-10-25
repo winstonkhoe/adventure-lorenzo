@@ -8,7 +8,7 @@ public class ThirdPersonMovement : PlayerController
     Player player;
     public GameObject crosshairPlacement;
     public Transform cam;
-    Camera mainCamera;
+
     public float speed = 6f;
 
     public float turnSmoothTime = 0.1f;
@@ -20,16 +20,6 @@ public class ThirdPersonMovement : PlayerController
         velocity.y = 0;
         animator = GetComponent<Animator>();
         player = GetComponent<Player>();
-        mainCamera = Camera.main;
-    }
-
-    private void FixedUpdate()
-    {
-        float yawCamera = mainCamera.transform.rotation.eulerAngles.y;
-        //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(Input.GetAxisRaw("Horizontal"), yawCamera, Input.GetAxisRaw("Vertical")), turnSmoothTime * Time.fixedDeltaTime);
-        
-        //var mouseX = Input.GetAxis("Mouse X");
-        
     }
 
     protected override void Update()
@@ -51,27 +41,21 @@ public class ThirdPersonMovement : PlayerController
         velocity.y -= 9.81f * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
 
-        
         if (direction.magnitude >= 0.1f)
         {
             animator.SetBool("isWalking", true);
-            //float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
-            
             float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
             float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
-            if (!player.onShootingMode)
+            if(!player.onShootingMode)
             {
                 transform.rotation = Quaternion.Euler(0f, angle, 0f);
             }
             else
             {
-                //angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
-                var mouseX = Input.GetAxis("Mouse X");
-                //targetAngle = mouseX;
-                //targetAngle = cam.eulerAngles.y;
-                transform.Rotate(new Vector3(0, mouseX, 0));
+                targetAngle = cam.eulerAngles.y;
+                angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
+                transform.rotation = Quaternion.Euler(0f, angle, 0f);
             }
-            //transform.rotation = Quaternion.Euler(0f, angle, 0f);
 
             Vector3 moveDirection = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
             controller.Move(moveDirection.normalized * speed * Time.deltaTime);

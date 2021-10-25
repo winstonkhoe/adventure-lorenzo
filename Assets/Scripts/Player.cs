@@ -35,7 +35,7 @@ public class Player : MonoBehaviour
         startTime = Time.time;
         initializeUIMenu();
         shield.SetActive(false);
-        putGunInPocket();
+
         initSpecialEffect();
     }
 
@@ -103,6 +103,7 @@ public class Player : MonoBehaviour
         }
         if(Input.GetKeyDown(KeyCode.Q))
         {
+<<<<<<< HEAD
             if(onShootingMode)
             {
                 Gun g = GetComponent<Gun>();
@@ -116,6 +117,15 @@ public class Player : MonoBehaviour
                 Gun g = GetComponent<Gun>();
                 handleSwitchWeapon(g.secondaryWeapon);
             }
+=======
+            Gun g = GetComponent<Gun>();
+            g.currentActiveWeapon = g.secondaryWeapon;
+        }
+        if(Input.GetKeyDown(KeyCode.E))
+        {
+            Gun g = GetComponent<Gun>();
+            g.currentActiveWeapon = g.primaryWeapon;
+>>>>>>> parent of 53877e5 (Several Additional Corrections)
         }
 
     }
@@ -158,7 +168,7 @@ public class Player : MonoBehaviour
         GameObject weapon = g.currentActiveWeapon.weaponObject;
         weaponParent = weapon.transform.parent;
         originalGunPosition = weapon.transform;
-        //ExplorationMode();
+        ExplorationMode();
     }
 
     private void playerDeath()
@@ -183,53 +193,25 @@ public class Player : MonoBehaviour
             }
             Destroy(g);
         }
-        else if (g.tag.Equals("Enemy"))
+        else if(g.tag.Equals("Enemy"))
         {
             CreateMessage cm = FindObjectOfType<CreateMessage>();
-            if (g.name.ToLower().Contains("mech"))
-            {
-                cm.createMessage("Press F to Override MECH");
-                if (Input.GetKeyDown(KeyCode.F))
-                {
-                    gameObject.SetActive(false);
-                    g.GetComponent<MechMovement>().overriden = true;
-                    //CharacterController enemy = g.GetComponent<CharacterController>();
-                    //GetComponent<ThirdPersonMovement>().controller = enemy;
-
-                }
-            }
-        }
-        else if (g.tag.Equals("Spaceship"))
-        {
-            CreateMessage cm = FindObjectOfType<CreateMessage>();
-            cm.createMessage("Press F to Leave this world!");
+            cm.createMessage("Press F to Override MECH");
             if (Input.GetKeyDown(KeyCode.F))
             {
-                VictoryCanvas();
+                Debug.Log("Masuk");
+                gameObject.SetActive(false);             
+                g.GetComponent<MechMovement>().overriden = true;
+                //CharacterController enemy = g.GetComponent<CharacterController>();
+                //GetComponent<ThirdPersonMovement>().controller = enemy;
+                
             }
         }
     }
 
         #region Player Animations
         
-        public Rig primaryWeaponRig;
-        public Rig secondaryWeaponRig;
-        
-        private void putGunInPocket()
-        {
-            Gun g = GetComponent<Gun>();
-            Transform primaryWeapon = g.primaryWeapon.weaponObject.transform;
-            Transform secondaryWeapon = g.secondaryWeapon.weaponObject.transform;
-
-            primaryWeapon.parent = rightPocket;
-            secondaryWeapon.parent = leftPocket;
-
-            primaryWeapon.position = rightPocket.position;
-            secondaryWeapon.position = leftPocket.position;
-
-            primaryWeapon.rotation = rightPocket.rotation;
-            secondaryWeapon.rotation = leftPocket.rotation;
-        }
+        public Rig rig;
 
         private void ExplorationMode()
         {
@@ -237,27 +219,16 @@ public class Player : MonoBehaviour
             GameObject weapon = g.currentActiveWeapon.weaponObject;
             if(weapon.Equals(g.primaryWeapon.weaponObject))
             {
-                StartCoroutine(SmoothRig(1, 0, primaryWeaponRig, weapon, rightHand, rightHand, rightPocket, rightPocket));
+                StartCoroutine(SmoothRig(1, 0, weapon, rightHand, rightHand, rightPocket, rightPocket));
             }
             else
             {
-                StartCoroutine(SmoothRig(1, 0, secondaryWeaponRig, weapon, leftHand, leftHand, leftPocket, leftPocket));
+                StartCoroutine(SmoothRig(1, 0, weapon, leftHand, leftHand, leftPocket, leftPocket));
             }
             
             //weapon.transform.parent = rightPocket;
             //weapon.transform.position = rightPocket.transform.position;
             //weapon.transform.rotation = rightPocket.transform.rotation;
-        }
-
-        private void handleSwitchWeapon(Gun.Weapon w)
-        {
-            Gun g = GetComponent<Gun>();
-            if(!g.currentActiveWeapon.Equals(w))
-            {
-                ExplorationMode();
-                g.currentActiveWeapon = w;
-                ShootingMode();
-            }
         }
 
         private void ShootingMode()
@@ -268,17 +239,17 @@ public class Player : MonoBehaviour
             //weapon.transform.position = rightHand.transform.position;
             if (weapon.Equals(g.primaryWeapon.weaponObject))
             {
-                StartCoroutine(SmoothRig(0, 1, primaryWeaponRig, weapon, rightHand, rightHand, weaponParent, originalGunPosition));
+                StartCoroutine(SmoothRig(0, 1, weapon, rightHand, rightHand, weaponParent, originalGunPosition));
             }
             else
             {
-                StartCoroutine(SmoothRig(0, 1, secondaryWeaponRig, weapon, leftHand, leftHand, weaponParent, originalGunPosition));
+                StartCoroutine(SmoothRig(0, 1, weapon, leftHand, leftHand, weaponParent, originalGunPosition));
             }
             //weapon.transform.position = originalGunPosition.position;
             //weapon.transform.rotation = originalGunPosition.rotation;
         }
 
-        IEnumerator SmoothRig(float start, float end, Rig layer, GameObject obj, Transform startPosParent, Transform startPos, Transform endPosParent, Transform endPos)
+        IEnumerator SmoothRig(float start, float end, GameObject obj, Transform startPosParent, Transform startPos, Transform endPosParent, Transform endPos)
 
         {
             float elapsedTime = 0;
@@ -290,7 +261,7 @@ public class Player : MonoBehaviour
             while (elapsedTime < waitTime)
 
             {
-                layer.weight = Mathf.Lerp(start, end, (elapsedTime / waitTime));
+                rig.weight = Mathf.Lerp(start, end, (elapsedTime / waitTime));
 
                 elapsedTime += Time.deltaTime;
 
