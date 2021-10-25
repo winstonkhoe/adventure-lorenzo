@@ -29,4 +29,9 @@ public class GameplayExtras : MonoBehaviour
         minute = (int)((elapsedTime - second) / 60);
         timeText.text = minute.ToString(fmt) + ":" + second.ToString(fmt);
     }
+
+    public float getElapsedTime()
+    {
+        return elapsedTime;
+    }
 }

@@ -103,13 +103,19 @@ public class Player : MonoBehaviour
         }
         if(Input.GetKeyDown(KeyCode.Q))
         {
-            Gun g = GetComponent<Gun>();
-            handleSwitchWeapon(g.primaryWeapon);
+            if(onShootingMode)
+            {
+                Gun g = GetComponent<Gun>();
+                handleSwitchWeapon(g.primaryWeapon);
+            }
         }
         if(Input.GetKeyDown(KeyCode.E))
         {
-            Gun g = GetComponent<Gun>();
-            handleSwitchWeapon(g.secondaryWeapon);
+            if (onShootingMode)
+            {
+                Gun g = GetComponent<Gun>();
+                handleSwitchWeapon(g.secondaryWeapon);
+            }
         }
 
     }
@@ -386,6 +392,11 @@ public class Player : MonoBehaviour
 
     private void VictoryCanvas()
     {
+        GameplayExtras ge = FindObjectOfType<GameplayExtras>();
+        elapsedTime = ge.getElapsedTime();
+        second = (int)elapsedTime % 60;
+        minute = (int)((elapsedTime - second) / 60);
+
         playerUICanvas.SetActive(false);
         victoryText.text = "Finished In " + minute.ToString(fmt) + ":" + second.ToString(fmt);
         victoryUICanvas.SetActive(true);

@@ -5,12 +5,13 @@ using UnityEngine;
 public class DoorController : MonoBehaviour
 {
     Animator doorAnimator;
- 
+
     bool reachTunnel;
+    static bool requirements;
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.tag.Equals("Player"))
+        if(other.tag.Equals("Player") || other.name.Equals("Mech"))
         {
             
             if(name.ToLower().Contains("victory"))
@@ -32,19 +33,23 @@ public class DoorController : MonoBehaviour
                 {
                     CreateMessage cm = FindObjectOfType<CreateMessage>();
                     cm.createMessage("NOT ENOUGH CORE ITEM");
-                    //CreateMessage.createMessage("NOT ENOUGH CORE ITEM");
+                    //CreateMessage.createMessage("NOT ENOUGH CORE ITEM");wwwwwwwwwwwwwwwwww
                 }
                 else
                 {
-                    doorAnimator.SetBool("character_nearby", true);
+                    requirements = true;
                 }
+            }
+            if(requirements)
+            {
+                doorAnimator.SetBool("character_nearby", true);
             }
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.tag.Equals("Player"))
+        if (other.tag.Equals("Player") || other.name.Equals("Mech"))
         {
             doorAnimator.SetBool("character_nearby", false);
         }
@@ -52,6 +57,7 @@ public class DoorController : MonoBehaviour
 
     void Start()
     {
+        requirements = false;
         reachTunnel = false;
         doorAnimator = GetComponent<Animator>();
     }

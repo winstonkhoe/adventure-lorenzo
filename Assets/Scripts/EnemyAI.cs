@@ -122,7 +122,7 @@ public class EnemyAI : MonoBehaviour
         GenerateEnemy ge = FindObjectOfType<GenerateEnemy>();
         Debug.Log("Enemy at patrolIndex " + patrolIndex + " is Dead");
         ge.cleanPatroliExist(gameObject.name, patrolIndex, spawnDelay);
-        Vector3.Lerp(transform.position, diePosition.position, 2);
+        //Vector3.Lerp(transform.position, diePosition.position, 2);
         //transform.Translate(destinationDrop * Time.deltaTime, Space.World);
         Destroy(gameObject, 4f);
     }
