@@ -125,6 +125,9 @@ public class Player : MonoBehaviour
         {
             Gun g = GetComponent<Gun>();
             g.currentActiveWeapon = g.primaryWeapon;
+<<<<<<< HEAD
+>>>>>>> parent of 53877e5 (Several Additional Corrections)
+=======
 >>>>>>> parent of 53877e5 (Several Additional Corrections)
         }
 
